@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - **Batch move** (`movie move --all`) — move all video files at once with auto-routing to movies/TV directories, preview table, and `[y/N]` confirmation
-- **JSON metadata export** — `movie scan` now writes per-file JSON metadata to `~/movie-cli-output/json/movie/` and `json/tv/`
+- **JSON metadata export** — `movie scan` now writes per-file JSON metadata to `./data/json/movie/` and `json/tv/`
 - **Genre-based discovery** — `movie suggest` uses `DiscoverByGenre` for TMDb genre-based recommendations (3-phase: genre discovery → recommendations → trending fallback)
 - **`GenreNameToID()` helper** — reverse genre map in tmdb package for name-to-ID lookups
 - **CI pipeline** (`.github/workflows/ci.yml`) — lint (`go vet` + `golangci-lint`), vulnerability scanning (`govulncheck`), parallel test matrix, cross-compiled builds (6 targets), SHA deduplication
@@ -15,12 +15,12 @@ All notable changes to this project will be documented in this file.
 - **`.golangci.yml`** — sensible linter defaults (errcheck, govet, staticcheck, gocritic, misspell, errorlint, etc.)
 - **Undo confirmation prompt** — `movie undo` shows from/to paths and asks `[y/N]` before reverting
 - **Tag command** (`movie tag`) — add, remove, and list tags on media entries
-- **Comprehensive CLI help** — root command shows version + categorized help with examples; `mahin --version` flag; `mahin version` shows Go/OS/arch
+- **Comprehensive CLI help** — root command shows version + categorized help with examples; `movie --version` flag; `movie version` shows Go/OS/arch
 
 ### Changed
 - **`movie ls`** now only shows scan-indexed items (filters by non-empty `original_file_path`)
 - **`movie suggest`** upgraded from recommendations-only to 3-phase strategy (DiscoverByGenre → Recommendations → Trending)
-- **Repository migrated** from `mahin-cli-v1` to `mahin-cli-v2` across all imports, workflows, and docs
+- **Repository migrated** from `movie-cli-v1` to `movie-cli-v2` across all imports, workflows, and docs
 
 ### Fixed
 - Timestamp bug — `saveHistoryLog` now uses `time.Now().Format(time.RFC3339)` instead of hardcoded "now"
