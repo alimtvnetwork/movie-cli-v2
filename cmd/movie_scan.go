@@ -10,9 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mahin/mahin-cli-v1/cleaner"
-	"github.com/mahin/mahin-cli-v1/db"
-	"github.com/mahin/mahin-cli-v1/tmdb"
+	"github.com/mahin/mahin-cli-v2/cleaner"
+	"github.com/mahin/mahin-cli-v2/db"
+	"github.com/mahin/mahin-cli-v2/tmdb"
 )
 
 var movieScanCmd = &cobra.Command{
@@ -231,6 +231,11 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 			} else {
 				fmt.Fprintf(os.Stderr, "     ❌ DB error: %v\n", err)
 			}
+		}
+
+		// Write JSON metadata file
+		if err := writeMediaJSON(database.BasePath, m); err != nil {
+			fmt.Fprintf(os.Stderr, "     ⚠️  JSON write error: %v\n", err)
 		}
 
 		if m.Type == "movie" {
