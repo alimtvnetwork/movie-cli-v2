@@ -781,3 +781,42 @@ foreach ($vLine in $versionLines) {
 
 Write-Host " +$('=' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
 Write-Host ""
+
+# -- Latest changelog ------------------------------------------
+$changelogPath = Join-Path $RepoRoot "CHANGELOG.md"
+if (Test-Path $changelogPath) {
+    $clLines = Get-Content $changelogPath -Encoding UTF8
+    $latestBlock = @()
+    $inBlock = $false
+    $blockCount = 0
+    foreach ($cl in $clLines) {
+        if ($cl -match '^## ') {
+            $blockCount++
+            if ($blockCount -eq 1) {
+                $inBlock = $true
+                $latestBlock += $cl
+                continue
+            } else {
+                break
+            }
+        }
+        if ($inBlock) { $latestBlock += $cl }
+    }
+    if ($latestBlock.Count -gt 0) {
+        Write-Host ""
+        Write-Host "  Latest changelog:" -ForegroundColor DarkCyan
+        Write-Host "  --------------------------------------------------" -ForegroundColor DarkGray
+        foreach ($cl in $latestBlock) {
+            if ($cl -match '^## ') {
+                Write-Host "  $cl" -ForegroundColor Cyan
+            } elseif ($cl -match '^### ') {
+                Write-Host "  $cl" -ForegroundColor Yellow
+            } elseif ($cl -match '^- ') {
+                Write-Host "  $cl" -ForegroundColor Gray
+            } elseif ($cl.Trim().Length -gt 0) {
+                Write-Host "  $cl" -ForegroundColor DarkGray
+            }
+        }
+        Write-Host ""
+    }
+}
