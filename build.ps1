@@ -75,9 +75,39 @@ if ($IsWindows_) {
     }
 }
 
+# Embed icon for Windows builds
+if ($IsWindows_) {
+    Write-Host "🎨 Embedding icon into binary..." -ForegroundColor Yellow
+    $iconPath = Join-Path $PSScriptRoot "assets" "icon.png"
+    if (Test-Path $iconPath) {
+        # Install go-winres if not available
+        $winresPath = & go env GOPATH
+        $winresBin = Join-Path $winresPath "bin" "go-winres.exe"
+        if (-not (Test-Path $winresBin)) {
+            Write-Host "   Installing go-winres..." -ForegroundColor Gray
+            go install github.com/tc-hib/go-winres@v0.3.3
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "⚠️  go-winres install failed — building without icon" -ForegroundColor Yellow
+            }
+        }
+        if (Test-Path $winresBin) {
+            & $winresBin init --icon $iconPath 2>$null
+            Write-Host "✅ Icon embedded" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "⚠️  Icon not found at $iconPath — building without icon" -ForegroundColor Yellow
+    }
+}
+
 go build -ldflags="-s -w" -o $BinaryFile .
 if ($LASTEXITCODE -ne 0) {
     Write-ErrorAndExit "Build failed!"
+}
+
+# Clean up winres artifacts
+if ($IsWindows_) {
+    Remove-Item -Path "*.syso" -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "winres" -Recurse -Force -ErrorAction SilentlyContinue
 }
 Write-Host "✅ Built: $BinaryFile" -ForegroundColor Green
 Write-Host ""

@@ -45,6 +45,11 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Resolved version: $VERSION"
 
+      - name: Embed icon for Windows builds
+        run: |
+          go install github.com/tc-hib/go-winres@v0.3.3
+          go-winres init --icon assets/icon.png
+
       - name: Build release binaries
         run: |
           VERSION="${{ steps.version.outputs.version }}"

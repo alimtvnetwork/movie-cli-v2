@@ -70,7 +70,7 @@ Aggregates test results, prints pass/fail summary, and writes the SHA cache on s
 
 ## Job: Build (Matrix)
 
-Cross-compiles for 6 targets with `CGO_ENABLED=0`. CI builds use `dev-{sha}` versioning. Uploads binaries as artifacts (14-day retention).
+Cross-compiles for 6 targets with `CGO_ENABLED=0`. For Windows targets, an icon embedding step runs first using `go-winres` (v0.3.3) to generate a `.syso` resource from `assets/icon.png`. CI builds use `dev-{sha}` versioning. Uploads binaries as artifacts (14-day retention).
 
 ## Job: Build Summary
 

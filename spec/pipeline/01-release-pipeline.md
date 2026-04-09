@@ -56,6 +56,19 @@ fi
 
 ---
 
+## Icon Embedding
+
+Windows binaries include an embedded application icon (`assets/icon.png`). The pipeline uses `go-winres` (v0.3.3) to generate a `.syso` resource file before compilation:
+
+```bash
+go install github.com/tc-hib/go-winres@v0.3.3
+go-winres init --icon assets/icon.png
+```
+
+This runs once before the build loop. The `.syso` file is automatically linked by `go build` for Windows targets. Non-Windows binaries are unaffected.
+
+---
+
 ## Binary Building
 
 ### Targets
