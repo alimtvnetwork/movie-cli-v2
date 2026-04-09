@@ -11,15 +11,16 @@ A cross-platform CLI tool for managing a personal movie and TV show library. Sca
 - **Undo** any move/rename operation
 - **Play** media files with your system's default player
 - **Suggest** new content based on your library's genre patterns or trending
-- **Stats** with genre charts and average ratings
+- **Tag** media with custom labels for organization
+- **Stats** with genre charts, storage usage, and average ratings
 - **Self-update** via `git pull --ff-only`
 
 ## Commands
 
 ```
-movie-cli
+mahin
 ├── hello                         # Greeting with version
-├── version                       # Version, commit, build date
+├── version                       # Version, commit, build date, Go, OS/arch
 ├── self-update                   # git pull --ff-only
 └── movie
     ├── config [get|set] [key]    # View/set configuration
@@ -36,17 +37,41 @@ movie-cli
     └── tag [add|remove|list]     # Manage user-defined tags
 ```
 
+---
+
 ## Installation
 
-### Prerequisites
+### Option 1 — Quick Install from GitHub Release
+
+Downloads the latest release binary, verifies SHA256 checksums, installs to your PATH. No Go or Git required.
+
+**Windows (PowerShell)**
+```powershell
+irm https://github.com/mahin/mahin-cli-v1/releases/latest/download/install.ps1 | iex
+```
+
+**Linux / macOS**
+```bash
+curl -fsSL https://github.com/mahin/mahin-cli-v1/releases/latest/download/install.sh | bash
+```
+
+**Install options:**
+
+| Flag | PowerShell | Bash | Default |
+|------|-----------|------|---------|
+| Install directory | `-InstallDir C:\tools\mahin` | `--dir ~/bin` | `%LOCALAPPDATA%\mahin` (Win) / `~/.local/bin` (Unix) |
+| Force architecture | `-Arch arm64` | `--arch arm64` | Auto-detect |
+| Skip PATH update | `-NoPath` | `--no-path` | Adds to PATH |
+
+### Option 2 — Build from Source
+
+**Prerequisites:**
 
 | Requirement | Minimum | Check |
 |---|---|---|
 | **Go** | 1.22+ | `go version` |
 | **Git** | 2.x | `git --version` |
 | **PowerShell** | 5.1+ (Win) / 7+ (Unix) | `$PSVersionTable.PSVersion` |
-
-### One-Liner Install
 
 **Windows (PowerShell)**
 ```powershell
@@ -58,25 +83,25 @@ git clone https://github.com/mahin/mahin-cli-v1.git; cd mahin-cli-v1; .\run.ps1
 git clone https://github.com/mahin/mahin-cli-v1.git && cd mahin-cli-v1 && pwsh run.ps1
 ```
 
-### Using the Installer
-
+**Using the bootstrap installer:**
 ```powershell
-# Fresh install (clones repo if needed, builds, deploys)
-pwsh install.ps1
-
-# Custom deploy path
-pwsh install.ps1 -DeployPath ~/bin
+pwsh install.ps1                      # Fresh install (clone + build + deploy)
+pwsh install.ps1 -DeployPath ~/bin    # Custom deploy path
 ```
 
 ### Verify
 
 ```bash
 mahin version
-# v1.x.x (commit: abc1234, built: 2024-06-01T12:00:00+08:00)
+# v1.0.0 (commit: abc1234, built: 2026-04-09)
+#   Go:   go1.22.0
+#   OS:   linux/amd64
 ```
 
-> **Tip**: If `mahin` is not found, add the deploy path to your `PATH`.  
-> Default: `E:\bin-run` (Windows) or `/usr/local/bin` (Unix).
+> **Tip**: If `mahin` is not found, add the deploy path to your `PATH`.
+> Default: `E:\bin-run` (Windows) or `/usr/local/bin` (Unix) for source builds.
+
+---
 
 ## Quick Start
 
@@ -97,6 +122,8 @@ mahin movie search "Inception"
 mahin movie suggest 5
 ```
 
+---
+
 ## Build & Deploy (run.ps1)
 
 The `run.ps1` script is the single-entry automation for pull → build → deploy → run.
@@ -114,45 +141,76 @@ See [spec/03-general/04-run-guide.md](spec/03-general/04-run-guide.md) for the f
 
 ---
 
+## Release Workflow
+
+Releases are fully automated via GitHub Actions. Pushing to a `release/**` branch or a `v*` tag triggers:
+
+1. **Cross-compilation** — 6 binaries (Windows/Linux/macOS × amd64/arm64)
+2. **Packaging** — `.zip` (Windows) and `.tar.gz` (Unix)
+3. **SHA256 checksums** — `checksums.txt` with all artifact hashes
+4. **Install scripts** — version-pinned `install.ps1` and `install.sh`
+5. **GitHub Release** — formatted page with changelog, checksums, and install instructions
+
+### Creating a Release
+
+```bash
+# Option A: Push a release branch
+git checkout -b release/v1.3.0
+git push origin release/v1.3.0
+
+# Option B: Tag directly
+git tag v1.3.0
+git push origin v1.3.0
+```
+
+Both trigger the same pipeline. Version is resolved from the ref name.
+
+See [spec/pipeline/01-release-pipeline.md](spec/pipeline/01-release-pipeline.md) for the full pipeline spec.
+
+---
+
 ## Command Reference
 
-### `movie-cli hello`
+### `mahin hello`
 
 Print a greeting with the current version.
 
 ```bash
-movie-cli hello
-# 👋 Hello from Movie CLI! v1.2.0
+mahin hello
+# 👋 Hello from mahin-cli-v1!
+#    Running version: v1.2.0
 ```
 
-### `movie-cli version`
+### `mahin version`
 
-Show version, commit hash, and build date (injected via `-ldflags`).
+Show version, commit hash, build date, Go version, and OS/architecture.
 
 ```bash
-movie-cli version
-# v1.2.0 (commit: abc1234, built: 2024-06-01)
+mahin version
+# mahin v1.2.0 (commit: abc1234, built: 2024-06-01)
+#   Go:   go1.22.0
+#   OS:   darwin/arm64
 ```
 
-### `movie-cli self-update`
+### `mahin self-update`
 
 Pull latest code via `git pull --ff-only`. Requires a clean working tree.
 
 ```bash
-movie-cli self-update
+mahin self-update
 # ✅ Updated abc1234 → def5678
 ```
 
-### `movie-cli movie config`
+### `mahin movie config`
 
 View or update configuration settings. API keys are masked in output.
 
 ```bash
-movie-cli movie config                          # Show all settings
-movie-cli movie config get movies_dir           # Get a single key
-movie-cli movie config set movies_dir ~/Movies  # Set a key
-movie-cli movie config set tmdb_api_key KEY     # Set API key
-movie-cli movie config set page_size 30         # Items per page
+mahin movie config                          # Show all settings
+mahin movie config get movies_dir           # Get a single key
+mahin movie config set movies_dir ~/Movies  # Set a key
+mahin movie config set tmdb_api_key KEY     # Set API key
+mahin movie config set page_size 30         # Items per page
 ```
 
 | Key | Default | Purpose |
@@ -164,49 +222,49 @@ movie-cli movie config set page_size 30         # Items per page
 | `tmdb_api_key` | *(none)* | TMDb API key |
 | `page_size` | `20` | Items per page in `ls` |
 
-### `movie-cli movie scan [folder]`
+### `mahin movie scan [folder]`
 
 Scan a directory for video files, clean filenames, fetch TMDb metadata, and save to the database. Falls back to `scan_dir` config if no folder is given. Skips duplicates by file path.
 
 ```bash
-movie-cli movie scan ~/Downloads
+mahin movie scan ~/Downloads
 # 📁 Scanning: /home/user/Downloads
 # 🎬 Found: Inception (2010) — ★ 8.4
 # 📺 Found: Breaking Bad S01E01 — ★ 9.5
 # ✅ Done: 15 files, 12 movies, 3 TV shows
 ```
 
-### `movie-cli movie ls`
+### `mahin movie ls`
 
 Paginated, interactive list of file-backed media (items with a local file on disk). Records from `search` or `info` without files are excluded. Navigate with `N`/`P`/`Q` or enter a number for detail view.
 
 ```bash
-movie-cli movie ls
+mahin movie ls
 #  1. 🎬 Inception (2010)               ★ 8.4
 #  2. 🎬 The Dark Knight (2008)         ★ 9.0
 #  3. 📺 Breaking Bad (2008)            ★ 9.5
 # Page 1/3 — [N]ext [P]rev [Q]uit or number:
 ```
 
-### `movie-cli movie search <name>`
+### `mahin movie search <name>`
 
 Search TMDb live, select a result, fetch full details + poster, and save to the database. Does **not** require a local file — catalogs metadata only.
 
 ```bash
-movie-cli movie search "Inception"
+mahin movie search "Inception"
 #  1. 🎬 Inception (2010) ★ 8.4
 #  2. 🎬 Inception: The Cobol Job (2010) ★ 7.2
 # Select (0 to cancel): 1
 # ✅ Saved: Inception (2010)
 ```
 
-### `movie-cli movie info <id|title>`
+### `mahin movie info <id|title>`
 
 Show detailed metadata for a media item. Looks up by numeric ID or title string in the local DB first, then falls back to TMDb API search (auto-saves if found).
 
 ```bash
-movie-cli movie info 1
-movie-cli movie info "Inception"
+mahin movie info 1
+mahin movie info "Inception"
 # 🎬 Inception (2010)
 # ★ IMDb 8.8 / TMDb 8.4
 # 🎭 Action, Sci-Fi, Thriller
@@ -214,24 +272,24 @@ movie-cli movie info "Inception"
 # 👥 Leonardo DiCaprio, Joseph Gordon-Levitt, ...
 ```
 
-### `movie-cli movie suggest [N]`
+### `mahin movie suggest [N]`
 
 Get movie/TV recommendations based on your library's genre patterns or TMDb trending. Choose between Movie, TV, or Random categories interactively.
 
 ```bash
-movie-cli movie suggest 5
+mahin movie suggest 5
 # 🎯 Your top genres: Action, Sci-Fi, Thriller
 #  1. 🎬 Tenet (2020) ★ 7.3 — Action, Sci-Fi
 #  2. 🎬 Arrival (2016) ★ 7.9 — Drama, Sci-Fi
 #  ...
 ```
 
-### `movie-cli movie move [directory]`
+### `mahin movie move [directory]`
 
 Browse a directory, select a video file, and move it to a configured destination with a clean filename (`Title (Year).ext`). Supports cross-drive moves with automatic copy+delete fallback.
 
 ```bash
-movie-cli movie move ~/Downloads
+mahin movie move ~/Downloads
 #  1. 🎬 Inception (2010)  [2.4 GB]
 #  2. 📺 Breaking Bad S01  [1.1 GB]
 # Select file: 1
@@ -239,12 +297,12 @@ movie-cli movie move ~/Downloads
 # ✅ Moved → ~/Movies/Inception (2010).mkv
 ```
 
-### `movie-cli movie rename`
+### `mahin movie rename`
 
 Batch rename all library files to clean format (`Title (Year).ext`). Shows a preview and asks for confirmation before renaming.
 
 ```bash
-movie-cli movie rename
+mahin movie rename
 # Renames to apply:
 #   inception.2010.bluray.mkv → Inception (2010).mkv
 #   the.dark.knight.mp4 → The Dark Knight (2008).mp4
@@ -252,32 +310,32 @@ movie-cli movie rename
 # ✅ 2/2 files renamed
 ```
 
-### `movie-cli movie undo`
+### `mahin movie undo`
 
 Revert the most recent move or rename operation. Moves the file back to its original location.
 
 ```bash
-movie-cli movie undo
+mahin movie undo
 # Last operation: ~/Downloads/inception.mkv → ~/Movies/Inception (2010).mkv
 # Undo this? [y/N]: y
 # ✅ Moved back to ~/Downloads/inception.mkv
 ```
 
-### `movie-cli movie play <id>`
+### `mahin movie play <id>`
 
 Open a media file with your system's default video player (macOS: `open`, Linux: `xdg-open`, Windows: `start`).
 
 ```bash
-movie-cli movie play 1
+mahin movie play 1
 # ▶️ Playing: Inception (2010)
 ```
 
-### `movie-cli movie stats`
+### `mahin movie stats`
 
 Display library statistics including counts, storage usage, genre distribution chart, and average ratings.
 
 ```bash
-movie-cli movie stats
+mahin movie stats
 # 📊 Library Stats
 # 🎬 Movies: 42  📺 TV Shows: 8  📦 Total: 50
 # 💾 Storage: 185.3 GB total, avg 3.7 GB, largest 8.2 GB
@@ -288,29 +346,31 @@ movie-cli movie stats
 # ★ Avg IMDb: 7.4 / Avg TMDb: 7.1
 ```
 
-### `movie-cli movie tag`
+### `mahin movie tag`
 
 Manage user-defined tags on media items.
 
 ```bash
-movie-cli movie tag add 1 favorite        # Add a tag
-movie-cli movie tag remove 1 favorite     # Remove a tag
-movie-cli movie tag list 1                # List tags for a media item
-movie-cli movie tag list                  # List all tags with counts
+mahin movie tag add 1 favorite        # Add a tag
+mahin movie tag remove 1 favorite     # Remove a tag
+mahin movie tag list 1                # List tags for a media item
+mahin movie tag list                  # List all tags with counts
 # favorite (3), watchlist (7), rewatch (2)
 ```
+
+---
 
 ## Project Structure
 
 ```
-movie-cli/
+mahin-cli-v1/
 ├── main.go                        # Entry point
 ├── cmd/                           # Cobra commands (one file per command)
 │   ├── root.go                    # Root command, registers subcommands
-│   ├── hello.go                   # movie-cli hello
-│   ├── version.go                 # movie-cli version
-│   ├── update.go                  # movie-cli self-update
-│   ├── movie.go                   # Parent: movie-cli movie
+│   ├── hello.go                   # mahin hello
+│   ├── version.go                 # mahin version
+│   ├── update.go                  # mahin self-update
+│   ├── movie.go                   # Parent: mahin movie
 │   ├── movie_config.go            # config get/set
 │   ├── movie_scan.go              # scan folder
 │   ├── movie_ls.go                # paginated list
@@ -323,6 +383,7 @@ movie-cli/
 │   ├── movie_undo.go              # undo last move/rename
 │   ├── movie_play.go              # open with default player
 │   ├── movie_stats.go             # library statistics
+│   ├── movie_tag.go               # tag management
 │   └── movie_resolve.go           # shared ID/title resolver
 ├── cleaner/cleaner.go             # Filename cleaning + slug generation
 ├── tmdb/client.go                 # TMDb API client
@@ -334,12 +395,18 @@ movie-cli/
 │   └── helpers.go                 # String utilities
 ├── updater/updater.go             # Git-based self-update
 ├── version/version.go             # Build-time version variables
-├── Makefile                       # Build targets
-├── build.ps1                      # PowerShell build + deploy
+├── .github/workflows/
+│   └── release.yml                # Release pipeline (cross-compile + GitHub Release)
+├── run.ps1                        # PowerShell build + deploy pipeline
+├── install.ps1                    # Bootstrap installer (clone + build)
+├── CHANGELOG.md                   # Release notes
 ├── spec.md                        # Full project specification
-└── spec/                          # Specs and issue tracking
-    ├── 01-app/                    # Application specs
-    └── 02-app/issues/             # Issue write-ups
+└── spec/                          # Detailed specs
+    ├── pipeline/                  # CI/CD pipeline specs
+    ├── 01-coding-guidelines/      # Code style
+    ├── 02-error-manage-spec/      # Error handling
+    ├── 03-general/                # Build, install, config guides
+    └── 08-app/                    # Application specs
 ```
 
 ## Build
@@ -367,8 +434,8 @@ All data lives in `./data/`:
 ```
 ./data/
 ├── movie-cli.db              # SQLite database (WAL mode)
-├── thumbnails/           # Downloaded poster images
-└── json/history/         # Move operation logs (RFC3339 timestamps)
+├── thumbnails/               # Downloaded poster images
+└── json/history/             # Move operation logs (RFC3339 timestamps)
 ```
 
 ## License
