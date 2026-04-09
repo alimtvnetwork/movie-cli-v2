@@ -21,6 +21,7 @@ A cross-platform CLI tool for managing a personal movie and TV show library. Sca
 movie
 ├── hello                         # Greeting with version
 ├── version                       # Version, commit, build date, Go, OS/arch
+├── changelog [--latest]          # Show changelog (full or latest version)
 ├── self-update                   # git pull --ff-only
 └── movie
     ├── config [get|set] [key]    # View/set configuration
@@ -356,6 +357,18 @@ movie movie tag remove 1 favorite     # Remove a tag
 movie movie tag list 1                # List tags for a media item
 movie movie tag list                  # List all tags with counts
 # favorite (3), watchlist (7), rewatch (2)
+```
+
+### `movie changelog`
+
+Show the project changelog. Prints the full changelog by default, or only the latest version block with `--latest`.
+
+```bash
+movie changelog              # Full changelog
+movie changelog --latest     # Latest version only
+# ## v1.0.0
+# ### Added
+# - Batch move, JSON export, genre-based discovery, ...
 ```
 
 ---
