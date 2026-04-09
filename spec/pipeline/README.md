@@ -9,6 +9,7 @@ Generic, portable documentation for the project's CI/CD pipeline architecture. T
 | Document | Purpose |
 |----------|---------|
 | [01-release-pipeline.md](./01-release-pipeline.md) | Release automation: version resolution, binary packaging, install scripts, GitHub releases |
+| [02-ci-pipeline.md](./02-ci-pipeline.md) | CI: lint, vulnerability scan, parallel tests, cross-compiled builds, SHA deduplication |
 
 ---
 
@@ -18,6 +19,7 @@ Generic, portable documentation for the project's CI/CD pipeline architecture. T
 
 | Workflow | Trigger | Branch/Tag |
 |----------|---------|------------|
+| CI | Push, Pull Request | `main` |
 | Release | Push | `release/**`, `v*` tags |
 
 ### Shared Conventions
