@@ -26,9 +26,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mahin/mahin-cli-v1/cleaner"
-	"github.com/mahin/mahin-cli-v1/db"
-	"github.com/mahin/mahin-cli-v1/tmdb"
+	"github.com/mahin/mahin-cli-v2/cleaner"
+	"github.com/mahin/mahin-cli-v2/db"
+	"github.com/mahin/mahin-cli-v2/tmdb"
 )
 
 var movieInfoCmd = &cobra.Command{

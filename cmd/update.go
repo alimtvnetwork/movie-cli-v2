@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mahin/mahin-cli-v1/updater"
+	"github.com/mahin/mahin-cli-v2/updater"
 )
 
 var selfUpdateCmd = &cobra.Command{

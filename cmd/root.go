@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mahin/mahin-cli-v1/version"
+	"github.com/mahin/mahin-cli-v2/version"
 )
 
 var rootCmd = &cobra.Command{
@@ -42,7 +42,7 @@ System:
   mahin version                                   Show version info
   mahin self-update                               Update via git pull
 
-Documentation: https://github.com/mahin/mahin-cli-v1`, version.Short()),
+Documentation: https://github.com/mahin/mahin-cli-v2`, version.Short()),
 	Version: version.Short(),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("mahin %s\n\n", version.Full())

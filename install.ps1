@@ -79,8 +79,8 @@ Write-Host ""
 Write-Host " [2/4] Locating repository" -ForegroundColor Magenta
 Write-Host (" " + ("-" * 50)) -ForegroundColor DarkGray
 
-$RepoName = "mahin-cli-v1"
-$RepoUrl  = "https://github.com/mahin/mahin-cli-v1.git"
+$RepoName = "mahin-cli-v2"
+$RepoUrl  = "https://github.com/mahin/mahin-cli-v2.git"
 
 # Check if we're already inside the repo
 $inRepo = (Test-Path "go.mod") -and (Test-Path "run.ps1")

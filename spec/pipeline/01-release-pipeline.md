@@ -76,9 +76,9 @@ Build for 6 platform/architecture combinations:
 ```bash
 CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build \
   -ldflags "-s -w \
-    -X 'github.com/mahin/mahin-cli-v1/version.Version=$VERSION' \
-    -X 'github.com/mahin/mahin-cli-v1/version.Commit=$COMMIT' \
-    -X 'github.com/mahin/mahin-cli-v1/version.BuildDate=$BUILD_DATE'" \
+    -X 'github.com/mahin/mahin-cli-v2/version.Version=$VERSION' \
+    -X 'github.com/mahin/mahin-cli-v2/version.Commit=$COMMIT' \
+    -X 'github.com/mahin/mahin-cli-v2/version.BuildDate=$BUILD_DATE'" \
   -o "dist/mahin-${VERSION}-${os}-${arch}${ext}" .
 ```
 

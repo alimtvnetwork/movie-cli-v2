@@ -13,8 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mahin/mahin-cli-v1/cleaner"
-	"github.com/mahin/mahin-cli-v1/db"
+	"github.com/mahin/mahin-cli-v2/cleaner"
+	"github.com/mahin/mahin-cli-v2/db"
 )
 
 // promptSourceDirectory shows configured directories and a custom option.

@@ -47,12 +47,12 @@ Downloads the latest release binary, verifies SHA256 checksums, installs to your
 
 **Windows (PowerShell)**
 ```powershell
-irm https://github.com/mahin/mahin-cli-v1/releases/latest/download/install.ps1 | iex
+irm https://github.com/mahin/mahin-cli-v2/releases/latest/download/install.ps1 | iex
 ```
 
 **Linux / macOS**
 ```bash
-curl -fsSL https://github.com/mahin/mahin-cli-v1/releases/latest/download/install.sh | bash
+curl -fsSL https://github.com/mahin/mahin-cli-v2/releases/latest/download/install.sh | bash
 ```
 
 **Install options:**
@@ -75,12 +75,12 @@ curl -fsSL https://github.com/mahin/mahin-cli-v1/releases/latest/download/instal
 
 **Windows (PowerShell)**
 ```powershell
-git clone https://github.com/mahin/mahin-cli-v1.git; cd mahin-cli-v1; .\run.ps1
+git clone https://github.com/mahin/mahin-cli-v2.git; cd mahin-cli-v2; .\run.ps1
 ```
 
 **macOS / Linux**
 ```bash
-git clone https://github.com/mahin/mahin-cli-v1.git && cd mahin-cli-v1 && pwsh run.ps1
+git clone https://github.com/mahin/mahin-cli-v2.git && cd mahin-cli-v2 && pwsh run.ps1
 ```
 
 **Using the bootstrap installer:**
@@ -177,7 +177,7 @@ Print a greeting with the current version.
 
 ```bash
 mahin hello
-# 👋 Hello from mahin-cli-v1!
+# 👋 Hello from mahin-cli-v2!
 #    Running version: v1.2.0
 ```
 
@@ -363,7 +363,7 @@ mahin movie tag list                  # List all tags with counts
 ## Project Structure
 
 ```
-mahin-cli-v1/
+mahin-cli-v2/
 ├── main.go                        # Entry point
 ├── cmd/                           # Cobra commands (one file per command)
 │   ├── root.go                    # Root command, registers subcommands
