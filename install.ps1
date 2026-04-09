@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
- One-step bootstrap: clone (if needed), build, and deploy mahin CLI.
+ One-step bootstrap: clone (if needed), build, and deploy movie CLI.
 .DESCRIPTION
  Detects OS, clones the repo if not already present, runs the full
  build pipeline via run.ps1, and verifies the installation.
@@ -30,7 +30,7 @@ function Write-Banner {
     Write-Host ""
     Write-Host " +======================================+" -ForegroundColor DarkCyan
     Write-Host " | " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "mahin installer" -ForegroundColor Cyan -NoNewline
+    Write-Host "movie installer" -ForegroundColor Cyan -NoNewline
     Write-Host "                  |" -ForegroundColor DarkCyan
     Write-Host " +======================================+" -ForegroundColor DarkCyan
     Write-Host ""
@@ -79,8 +79,8 @@ Write-Host ""
 Write-Host " [2/4] Locating repository" -ForegroundColor Magenta
 Write-Host (" " + ("-" * 50)) -ForegroundColor DarkGray
 
-$RepoName = "mahin-cli-v2"
-$RepoUrl  = "https://github.com/mahin/mahin-cli-v2.git"
+$RepoName = "movie-cli-v2"
+$RepoUrl  = "https://github.com/movie/movie-cli-v2.git"
 
 # Check if we're already inside the repo
 $inRepo = (Test-Path "go.mod") -and (Test-Path "run.ps1")
@@ -146,15 +146,15 @@ Write-Host " [4/4] Verifying installation" -ForegroundColor Magenta
 Write-Host (" " + ("-" * 50)) -ForegroundColor DarkGray
 
 $prevPref = $ErrorActionPreference; $ErrorActionPreference = "Continue"
-$verOutput = mahin version 2>&1
+$verOutput = movie version 2>&1
 $verExit = $LASTEXITCODE
 $ErrorActionPreference = $prevPref
 
 if ($verExit -eq 0) {
-    Write-Ok "mahin is ready: $("$verOutput".Trim())"
+    Write-Ok "movie is ready: $("$verOutput".Trim())"
 } else {
     foreach ($line in $verOutput) { Write-Host "    $line" -ForegroundColor Red }
-    Write-ErrorAndExit "Verification failed — 'mahin version' returned exit code $verExit" "Add the deploy directory to your PATH, then try again"
+    Write-ErrorAndExit "Verification failed — 'movie version' returned exit code $verExit" "Add the deploy directory to your PATH, then try again"
 }
 
 Write-Host ""
