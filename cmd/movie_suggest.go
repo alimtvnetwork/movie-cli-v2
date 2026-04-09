@@ -136,17 +136,41 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 		existingIDs[e.TmdbID] = true
 	}
 
-	// Fetch recommendations based on random items from library
 	var suggestions []tmdb.SearchResult
-	if len(existing) > 0 {
-		// Pick random items to get recommendations from
+
+	// Phase 1: DiscoverByGenre — use top genres for genre-based discovery
+	genreNameToID := tmdb.GenreNameToID()
+	for _, g := range sorted {
+		if len(suggestions) >= count {
+			break
+		}
+		genreID, ok := genreNameToID[g.name]
+		if !ok {
+			continue
+		}
+		fmt.Printf("  🎭 Discovering %s %s...\n", g.name, typeName)
+		discovered, discErr := client.DiscoverByGenre(mediaType, genreID, 1)
+		if discErr != nil {
+			fmt.Fprintf(os.Stderr, "     ⚠️  Discover error: %v\n", discErr)
+			continue
+		}
+		for _, d := range discovered {
+			if !existingIDs[d.ID] && len(suggestions) < count {
+				suggestions = append(suggestions, d)
+				existingIDs[d.ID] = true
+			}
+		}
+	}
+
+	// Phase 2: Recommendations from random library items (fill gaps)
+	if len(suggestions) < count && len(existing) > 0 {
 		indices := rand.Perm(len(existing))
 		for _, idx := range indices {
 			if len(suggestions) >= count {
 				break
 			}
-			recs, err := client.GetRecommendations(existing[idx].TmdbID, mediaType, 1)
-			if err != nil {
+			recs, recErr := client.GetRecommendations(existing[idx].TmdbID, mediaType, 1)
+			if recErr != nil {
 				continue
 			}
 			for _, r := range recs {
@@ -158,7 +182,7 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 		}
 	}
 
-	// Fill remaining with trending
+	// Phase 3: Fill remaining with trending
 	if len(suggestions) < count {
 		trending, trendErr := client.Trending(mediaType)
 		if trendErr != nil {
@@ -172,6 +196,7 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 		}
 	}
 
+	fmt.Println()
 	printSuggestions(suggestions, typeName)
 }
 
