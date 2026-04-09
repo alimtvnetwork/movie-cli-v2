@@ -86,7 +86,7 @@
 - [ ] `movie undo` confirmation prompt before reverting
 
 ### Phase 2: Spec Completeness (P1)
-- [ ] Clarify `movie ls` filter rule (scan-indexed items only)
+- [x] Clarify `movie ls` filter rule (scan-indexed items only) ✅ 09-Apr-2026
 
 ### Phase 3: Enhancements (P3)
 - [x] Batch move (`--all` flag for `movie move`) ✅ 09-Apr-2026

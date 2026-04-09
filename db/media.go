@@ -67,14 +67,15 @@ func (d *DB) UpdateMediaPath(mediaID int64, newPath string) error {
 	return err
 }
 
-// ListMedia returns paginated media records.
+// ListMedia returns paginated media records (only scan-indexed items with a file path).
 func (d *DB) ListMedia(offset, limit int) ([]Media, error) {
 	rows, err := d.Query(`
 		SELECT id, title, clean_title, year, type, tmdb_id, imdb_id,
 			description, imdb_rating, tmdb_rating, popularity, genre,
 			director, cast_list, thumbnail_path, original_file_name,
 			original_file_path, current_file_path, file_extension, file_size
-		FROM media ORDER BY clean_title ASC LIMIT ? OFFSET ?`, limit, offset)
+		FROM media WHERE original_file_path != ''
+		ORDER BY clean_title ASC LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -138,14 +139,14 @@ func (d *DB) GetMediaByTmdbID(tmdbID int) (*Media, error) {
 	return m, nil
 }
 
-// CountMedia returns total count, optionally filtered by type.
+// CountMedia returns total count of scan-indexed items, optionally filtered by type.
 func (d *DB) CountMedia(mediaType string) (int, error) {
 	var count int
 	var err error
 	if mediaType == "" {
-		err = d.QueryRow("SELECT COUNT(*) FROM media").Scan(&count)
+		err = d.QueryRow("SELECT COUNT(*) FROM media WHERE original_file_path != ''").Scan(&count)
 	} else {
-		err = d.QueryRow("SELECT COUNT(*) FROM media WHERE type = ?", mediaType).Scan(&count)
+		err = d.QueryRow("SELECT COUNT(*) FROM media WHERE type = ? AND original_file_path != ''", mediaType).Scan(&count)
 	}
 	return count, err
 }

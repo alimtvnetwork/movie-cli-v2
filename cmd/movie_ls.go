@@ -14,8 +14,9 @@ import (
 
 var movieLsCmd = &cobra.Command{
 	Use:   "ls",
-	Short: "List movies and TV shows from your library",
-	Long: `Lists scanned movies and TV shows with pagination.
+	Short: "List scanned movies and TV shows from your library",
+	Long: `Lists scan-indexed movies and TV shows (items with a known file path).
+Only items added via 'mahin movie scan' are shown.
 Press N for next page, P for previous, Q to quit.`,
 	Run: runMovieLs,
 }
