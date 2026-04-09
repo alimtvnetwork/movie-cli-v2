@@ -38,11 +38,11 @@ func runMovieRename(cmd *cobra.Command, args []string) {
 
 	// Find files that need renaming
 	type renameItem struct {
-		media   db.Media
 		oldPath string
 		newPath string
 		oldName string
 		newName string
+		media   db.Media
 	}
 
 	var items []renameItem
