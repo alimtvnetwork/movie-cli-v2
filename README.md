@@ -57,6 +57,25 @@ Every command supports `--help` or `-h` for detailed usage.
 
 <div align="center">
 
+## ✨ Features
+
+</div>
+
+- 🔍 **Smart Filename Cleaning** — Strips junk from torrent names: `Scream.2022.1080p.WEBRip.x264.mkv` → `Scream (2022).mkv`
+- 🎬 **TMDb Integration** — Auto-fetches metadata, ratings, posters, cast & crew from The Movie Database
+- 📂 **Batch File Operations** — Move, rename, and organize entire folders in one command
+- 🏷️ **Tagging System** — Add custom tags to any movie or show for personal categorization
+- 🎯 **Smart Suggestions** — Genre-based recommendations and trending content powered by TMDb
+- 📊 **Library Statistics** — Counts, storage usage, top genres, and average ratings at a glance
+- ⏪ **Undo Support** — Revert any move or rename with a single command
+- 🗃️ **Portable Data** — SQLite (WAL mode) + JSON exports — no server, no cloud, fully offline
+- 🖥️ **Cross-Platform** — Native binaries for Windows, Linux, and macOS (amd64 + arm64)
+- 📦 **One-Command Install** — Automated install scripts with auto-PATH setup
+
+---
+
+<div align="center">
+
 ## Installation
 
 </div>
