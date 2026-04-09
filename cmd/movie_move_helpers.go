@@ -132,7 +132,10 @@ func promptSourceDirectory(scanner interface {
 }
 
 // promptDestination asks the user to choose a move destination.
-func promptDestination(scanner interface{ Scan() bool; Text() string }, database *db.DB, home string) string {
+func promptDestination(scanner interface {
+	Scan() bool
+	Text() string
+}, database *db.DB, home string) string {
 	moviesDir, _ := database.GetConfig("movies_dir")
 	tvDir, _ := database.GetConfig("tv_dir")
 	archiveDir, _ := database.GetConfig("archive_dir")

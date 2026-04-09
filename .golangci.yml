@@ -17,7 +17,7 @@ linters:
     - gocritic        # opinionated style checks
     - gofmt           # formatting
     - misspell        # spelling in comments/strings
-    - exportloopref   # loop variable capture bugs
+    - copyloopvar     # loop variable capture bugs (replaces exportloopref)
     - nilerr          # returning nil after checking err != nil
     - bodyclose       # unclosed HTTP response bodies
     - durationcheck   # incorrect time.Duration multiplications

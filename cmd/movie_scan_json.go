@@ -29,10 +29,10 @@ type scanMediaJSON struct {
 	CurrentFilePath  string  `json:"current_file_path"`
 	FileExtension    string  `json:"file_extension"`
 	GeneratedAt      string  `json:"generated_at"`
-	FileSize         int64   `json:"file_size"`
 	ImdbRating       float64 `json:"imdb_rating,omitempty"`
 	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
 	Popularity       float64 `json:"popularity,omitempty"`
+	FileSize         int64   `json:"file_size"`
 	Year             int     `json:"year,omitempty"`
 	TmdbID           int     `json:"tmdb_id,omitempty"`
 }
