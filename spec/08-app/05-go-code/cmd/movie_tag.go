@@ -1,0 +1,176 @@
+package cmd
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
+	"github.com/mahin/movie-cli/db"
+	"github.com/spf13/cobra"
+)
+
+// movie tag — parent command
+var tagCmd = &cobra.Command{
+	Use:   "tag",
+	Short: "Manage tags on media items",
+	Long:  "Add, remove, or list user-defined tags on movies and TV shows.",
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
+}
+
+// movie tag add <id> <tag>
+var tagAddCmd = &cobra.Command{
+	Use:   "add <id> <tag>",
+	Short: "Add a tag to a media item",
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		d := mustOpenDB()
+		defer d.Close()
+
+		id, err := strconv.Atoi(args[0])
+		if err != nil {
+			fmt.Println("Error: Invalid ID —", args[0])
+			os.Exit(1)
+		}
+		tag := strings.TrimSpace(args[1])
+		if tag == "" {
+			fmt.Println("Error: Tag cannot be empty")
+			os.Exit(1)
+		}
+
+		media, err := d.GetMediaByID(id)
+		if err != nil || media == nil {
+			fmt.Println("Error: Media not found with ID", id)
+			os.Exit(1)
+		}
+
+		err = d.AddTag(id, tag)
+		if err != nil {
+			if strings.Contains(err.Error(), "UNIQUE constraint") {
+				fmt.Printf("Error: Tag \"%s\" already exists on \"%s\"\n", tag, media.Title)
+			} else {
+				fmt.Println("Error:", err)
+			}
+			os.Exit(1)
+		}
+
+		year := ""
+		if media.Year > 0 {
+			year = fmt.Sprintf(" (%d)", media.Year)
+		}
+		fmt.Printf("Tag \"%s\" added to \"%s%s\"\n", tag, media.Title, year)
+	},
+}
+
+// movie tag remove <id> <tag>
+var tagRemoveCmd = &cobra.Command{
+	Use:   "remove <id> <tag>",
+	Short: "Remove a tag from a media item",
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		d := mustOpenDB()
+		defer d.Close()
+
+		id, err := strconv.Atoi(args[0])
+		if err != nil {
+			fmt.Println("Error: Invalid ID —", args[0])
+			os.Exit(1)
+		}
+		tag := strings.TrimSpace(args[1])
+
+		media, err := d.GetMediaByID(id)
+		if err != nil || media == nil {
+			fmt.Println("Error: Media not found with ID", id)
+			os.Exit(1)
+		}
+
+		removed, err := d.RemoveTag(id, tag)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		if !removed {
+			fmt.Printf("Error: Tag \"%s\" not found on \"%s\"\n", tag, media.Title)
+			os.Exit(1)
+		}
+
+		year := ""
+		if media.Year > 0 {
+			year = fmt.Sprintf(" (%d)", media.Year)
+		}
+		fmt.Printf("Tag \"%s\" removed from \"%s%s\"\n", tag, media.Title, year)
+	},
+}
+
+// movie tag list [id]
+var tagListCmd = &cobra.Command{
+	Use:   "list [id]",
+	Short: "List tags (for a media item or all)",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		d := mustOpenDB()
+		defer d.Close()
+
+		if len(args) == 1 {
+			// List tags for specific media
+			id, err := strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Println("Error: Invalid ID —", args[0])
+				os.Exit(1)
+			}
+
+			media, err := d.GetMediaByID(id)
+			if err != nil || media == nil {
+				fmt.Println("Error: Media not found with ID", id)
+				os.Exit(1)
+			}
+
+			tags, err := d.GetTagsByMediaID(id)
+			if err != nil {
+				fmt.Println("Error:", err)
+				os.Exit(1)
+			}
+
+			year := ""
+			if media.Year > 0 {
+				year = fmt.Sprintf(" (%d)", media.Year)
+			}
+
+			if len(tags) == 0 {
+				fmt.Printf("No tags for \"%s%s\"\n", media.Title, year)
+				return
+			}
+
+			fmt.Printf("Tags for \"%s%s\":\n", media.Title, year)
+			for _, t := range tags {
+				fmt.Printf("  • %s\n", t)
+			}
+		} else {
+			// List all unique tags with counts
+			tagCounts, err := d.GetAllTagCounts()
+			if err != nil {
+				fmt.Println("Error:", err)
+				os.Exit(1)
+			}
+
+			if len(tagCounts) == 0 {
+				fmt.Println("No tags in library")
+				return
+			}
+
+			fmt.Println("All tags:")
+			for _, tc := range tagCounts {
+				fmt.Printf("  %s (%d)\n", tc.Tag, tc.Count)
+			}
+		}
+	},
+}
+
+func init() {
+	movieCmd.AddCommand(tagCmd)
+	tagCmd.AddCommand(tagAddCmd)
+	tagCmd.AddCommand(tagRemoveCmd)
+	tagCmd.AddCommand(tagListCmd)
+}
