@@ -78,7 +78,7 @@ if ($IsWindows_) {
 # Embed icon for Windows builds
 if ($IsWindows_) {
     Write-Host "🎨 Embedding icon into binary..." -ForegroundColor Yellow
-    $iconPath = Join-Path $PSScriptRoot "assets" "icon.png"
+    $iconPath = Join-Path $PSScriptRoot "assets" "icon.ico"
     if (Test-Path $iconPath) {
         # Install go-winres if not available
         $winresPath = & go env GOPATH
