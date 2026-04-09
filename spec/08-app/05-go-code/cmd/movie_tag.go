@@ -44,7 +44,7 @@ var tagAddCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		media, err := d.GetMediaByID(id)
+		media, err := d.GetMediaByID(int64(id))
 		if err != nil || media == nil {
 			fmt.Println("Error: Media not found with ID", id)
 			os.Exit(1)
@@ -88,7 +88,7 @@ var tagRemoveCmd = &cobra.Command{
 		}
 		tag := strings.TrimSpace(args[1])
 
-		media, err := d.GetMediaByID(id)
+		media, err := d.GetMediaByID(int64(id))
 		if err != nil || media == nil {
 			fmt.Println("Error: Media not found with ID", id)
 			os.Exit(1)
@@ -133,7 +133,7 @@ var tagListCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			media, err := d.GetMediaByID(id)
+			media, err := d.GetMediaByID(int64(id))
 			if err != nil || media == nil {
 				fmt.Println("Error: Media not found with ID", id)
 				os.Exit(1)

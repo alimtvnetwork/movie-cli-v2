@@ -14,7 +14,7 @@ import (
 )
 
 // mediaJSON is the JSON representation written to disk.
-type mediaJSON struct {
+type scanMediaJSON struct {
 	Title            string  `json:"title"`
 	CleanTitle       string  `json:"clean_title"`
 	Year             int     `json:"year,omitempty"`
@@ -55,7 +55,7 @@ func writeMediaJSON(basePath string, m *db.Media) error {
 		return fmt.Errorf("cannot create json dir: %w", err)
 	}
 
-	data := mediaJSON{
+	data := scanMediaJSON{
 		Title:            m.Title,
 		CleanTitle:       m.CleanTitle,
 		Year:             m.Year,

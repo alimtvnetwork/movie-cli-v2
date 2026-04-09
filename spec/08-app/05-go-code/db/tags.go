@@ -11,7 +11,7 @@ type TagCount struct {
 // AddTag inserts a tag for a media item.
 // Returns UNIQUE constraint error if tag already exists.
 func (d *DB) AddTag(mediaID int, tag string) error {
-	_, err := d.db.Exec(
+	_, err := d.Exec(
 		`INSERT INTO tags (media_id, tag) VALUES (?, ?)`,
 		mediaID, tag,
 	)
@@ -21,7 +21,7 @@ func (d *DB) AddTag(mediaID int, tag string) error {
 // RemoveTag deletes a tag from a media item.
 // Returns (true, nil) if deleted, (false, nil) if tag didn't exist.
 func (d *DB) RemoveTag(mediaID int, tag string) (bool, error) {
-	result, err := d.db.Exec(
+	result, err := d.Exec(
 		`DELETE FROM tags WHERE media_id = ? AND tag = ?`,
 		mediaID, tag,
 	)
@@ -37,7 +37,7 @@ func (d *DB) RemoveTag(mediaID int, tag string) (bool, error) {
 
 // GetTagsByMediaID returns all tags for a specific media item.
 func (d *DB) GetTagsByMediaID(mediaID int) ([]string, error) {
-	rows, err := d.db.Query(
+	rows, err := d.Query(
 		`SELECT tag FROM tags WHERE media_id = ? ORDER BY tag`,
 		mediaID,
 	)
@@ -60,7 +60,7 @@ func (d *DB) GetTagsByMediaID(mediaID int) ([]string, error) {
 // GetAllTagCounts returns all unique tags with their usage count,
 // ordered by count descending.
 func (d *DB) GetAllTagCounts() ([]TagCount, error) {
-	rows, err := d.db.Query(
+	rows, err := d.Query(
 		`SELECT tag, COUNT(*) as cnt FROM tags GROUP BY tag ORDER BY cnt DESC, tag ASC`,
 	)
 	if err != nil {
