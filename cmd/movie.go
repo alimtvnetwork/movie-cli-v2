@@ -57,5 +57,6 @@ func init() {
 		movieStatsCmd,
 		movieRenameCmd,
 		movieConfigCmd,
+		movieExportCmd,
 	)
 }

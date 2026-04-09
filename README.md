@@ -35,7 +35,8 @@ movie
     ├── undo                      # Revert last move/rename
     ├── play <id>                 # Open with default video player
     ├── stats                     # Counts, storage, genre chart, avg ratings
-    └── tag [add|remove|list]     # Manage user-defined tags
+    ├── tag [add|remove|list]     # Manage user-defined tags
+    └── export [-o path]          # Dump media table as JSON
 ```
 
 ---
@@ -359,7 +360,16 @@ movie movie tag list                  # List all tags with counts
 # favorite (3), watchlist (7), rewatch (2)
 ```
 
-### `movie changelog`
+### `movie export`
+
+Export the entire media library as a JSON file. Default output: `./data/json/export/media.json`.
+
+```bash
+movie export                              # Export to default path
+movie export -o ~/Desktop/library.json    # Custom output path
+# ✅ Exported 50 items → ./data/json/export/media.json
+```
+
 
 Show the project changelog. Prints the full changelog by default, or only the latest version block with `--latest`.
 
