@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
- Build, deploy, and run mahin CLI from the repo root.
+ Build, deploy, and run movie CLI from the repo root.
 .DESCRIPTION
  Pulls latest code, resolves Go dependencies, builds the binary
  into ./bin, deploys to a target directory, and optionally runs
- mahin with any arguments.
+ movie with any arguments.
 .EXAMPLES
  .\run.ps1                        # pull, build, deploy
  .\run.ps1 -NoPull                # skip git pull
@@ -17,8 +17,8 @@
  .\run.ps1 -t                     # run all unit tests with reports
 .NOTES
  Configuration is read from powershell.json.
- -R accepts ALL mahin CLI arguments after it (scan, ls, move, help, flags, paths).
- If -R is used with no arguments, it defaults to: movie scan <parentDir>
+ -R accepts ALL movie CLI arguments after it (scan, ls, move, help, flags, paths).
+  If -R is used with no arguments, it defaults to: movie scan <parentDir>
  -t runs all Go unit tests and writes reports to data/unit-test-reports/.
  -ForcePull automatically discards local changes and removes untracked files
  before pulling. Useful for CI or unattended builds.
@@ -87,8 +87,8 @@ function Show-Banner {
     Write-Host ""
     Write-Host " +======================================+" -ForegroundColor DarkCyan
     Write-Host " | " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "mahin builder" -ForegroundColor Cyan -NoNewline
-    Write-Host "                    |" -ForegroundColor DarkCyan
+    Write-Host "movie-cli builder" -ForegroundColor Cyan -NoNewline
+    Write-Host "                |" -ForegroundColor DarkCyan
     Write-Host " +======================================+" -ForegroundColor DarkCyan
     Write-Host ""
 }
@@ -388,8 +388,8 @@ function Build-Binary {
     Push-Location $RepoRoot
     try {
         $binaryName = $config.binaryName
-        if (-not $binaryName) { $binaryName = "mahin.exe" }
-        $buildOutput = $config.buildOutput
+    if (-not $binaryName) { $binaryName = "movie.exe" }
+    $buildOutput = $config.buildOutput
         if (-not $buildOutput) { $buildOutput = "./bin" }
 
         # Create build output directory
@@ -507,7 +507,7 @@ function Deploy-Binary {
     }
 
     $binaryName = $config.binaryName
-    if (-not $binaryName) { $binaryName = "mahin.exe" }
+    if (-not $binaryName) { $binaryName = "movie.exe" }
 
     # Create deploy directory if needed
     if (-not (Test-Path $deployPath)) {
@@ -742,18 +742,42 @@ if ($R) {
 }
 
 # -- Summary ---------------------------------------------------
+
+# Parse version output into separate lines
+$versionLines = @()
+if ($finalVersionText -and $finalVersionText -ne "unknown") {
+    $rawLines = $finalVersionText -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_.Length -gt 0 }
+    foreach ($l in $rawLines) { $versionLines += $l }
+} else {
+    $versionLines += "unknown"
+}
+
+$boxWidth = 40
+$innerWidth = $boxWidth - 4  # account for " | " and " |"
+
 Write-Host ""
-Write-Host " +======================================+" -ForegroundColor DarkCyan
+Write-Host " +$('=' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
+# Title line
+$title = "All done!"
+$titlePad = $innerWidth - $title.Length
+if ($titlePad -lt 0) { $titlePad = 0 }
 Write-Host " | " -ForegroundColor DarkCyan -NoNewline
-Write-Host "All done!" -ForegroundColor Green -NoNewline
-Write-Host "                       |" -ForegroundColor DarkCyan
-Write-Host " +--------------------------------------+" -ForegroundColor DarkCyan
-Write-Host " | " -ForegroundColor DarkCyan -NoNewline
-Write-Host "Version: $finalVersionText" -ForegroundColor Cyan -NoNewline
-# Pad to align closing pipe
-$pad = 37 - ("Version: $finalVersionText").Length
-if ($pad -lt 1) { $pad = 1 }
-Write-Host (" " * $pad) -NoNewline
-Write-Host "|" -ForegroundColor DarkCyan
-Write-Host " +======================================+" -ForegroundColor DarkCyan
+Write-Host $title -ForegroundColor Green -NoNewline
+Write-Host "$(' ' * $titlePad) |" -ForegroundColor DarkCyan
+Write-Host " +$('-' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
+
+# Version info lines
+foreach ($vLine in $versionLines) {
+    $displayLine = $vLine
+    if ($displayLine.Length -gt $innerWidth) {
+        $displayLine = $displayLine.Substring(0, $innerWidth)
+    }
+    $linePad = $innerWidth - $displayLine.Length
+    if ($linePad -lt 0) { $linePad = 0 }
+    Write-Host " | " -ForegroundColor DarkCyan -NoNewline
+    Write-Host $displayLine -ForegroundColor Cyan -NoNewline
+    Write-Host "$(' ' * $linePad) |" -ForegroundColor DarkCyan
+}
+
+Write-Host " +$('=' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
 Write-Host ""

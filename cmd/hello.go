@@ -1,4 +1,4 @@
-// hello.go — implements the `mahin hello` command.
+// hello.go — implements the `movie hello` command.
 package cmd
 
 import (
@@ -13,7 +13,7 @@ var helloCmd = &cobra.Command{
 	Use:   "hello",
 	Short: "Print a greeting",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("👋 Hello from mahin-cli-v2!")
+		fmt.Println("👋 Hello from movie-cli!")
 		fmt.Printf("   Running version: %s\n", version.Short())
 	},
 }

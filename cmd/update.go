@@ -1,4 +1,4 @@
-// update.go — implements the `mahin self-update` command.
+// update.go — implements the `movie self-update` command.
 package cmd
 
 import (

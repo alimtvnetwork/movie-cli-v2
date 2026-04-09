@@ -1,4 +1,4 @@
-# build.ps1 — Pull, build, and deploy mahin CLI
+# build.ps1 — Pull, build, and deploy movie CLI
 # Usage: pwsh build.ps1
 
 param(
@@ -6,7 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$BinaryName = "mahin"
+$BinaryName = "movie"
 
 function Write-ErrorAndExit {
     param([string]$Message, [string]$Hint = "")
@@ -33,7 +33,7 @@ if ($BinDir) {
 
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
-Write-Host "  🔧 Mahin CLI — Build & Deploy" -ForegroundColor Cyan
+Write-Host "  🔧 Movie CLI — Build & Deploy" -ForegroundColor Cyan
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
 Write-Host ""
 
@@ -113,7 +113,7 @@ try {
 # Step 6: Verify
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
-Write-Host "  ✅ Done! Run 'mahin' to use." -ForegroundColor Green
+Write-Host "  ✅ Done! Run 'movie' to use." -ForegroundColor Green
 Write-Host "  📍 Binary at: $DestPath" -ForegroundColor Gray
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
 Write-Host ""
@@ -126,9 +126,9 @@ $verifyExit = $LASTEXITCODE
 $ErrorActionPreference = $prevPref
 
 if ($verifyExit -eq 0) {
-    Write-Host "  🎉 Verified — mahin is ready!" -ForegroundColor Green
+    Write-Host "  🎉 Verified — movie-cli is ready!" -ForegroundColor Green
 } else {
-    Write-Host "  ⚠️  Binary deployed but 'mahin version' failed (exit $verifyExit)." -ForegroundColor Yellow
+    Write-Host "  ⚠️  Binary deployed but 'movie version' failed (exit $verifyExit)." -ForegroundColor Yellow
     foreach ($line in $verifyOutput) { Write-Host "    $line" -ForegroundColor Yellow }
     Write-Host "  Make sure $DestDir is in your PATH." -ForegroundColor Yellow
 }
