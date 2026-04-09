@@ -4,17 +4,11 @@ import "database/sql"
 
 // Media represents a row in the media table.
 type Media struct {
-	ID               int64
 	Title            string
 	CleanTitle       string
-	Year             int
 	Type             string // "movie" or "tv"
-	TmdbID           int
 	ImdbID           string
 	Description      string
-	ImdbRating       float64
-	TmdbRating       float64
-	Popularity       float64
 	Genre            string
 	Director         string
 	CastList         string
@@ -23,7 +17,13 @@ type Media struct {
 	OriginalFilePath string
 	CurrentFilePath  string
 	FileExtension    string
+	ID               int64
 	FileSize         int64
+	ImdbRating       float64
+	TmdbRating       float64
+	Popularity       float64
+	Year             int
+	TmdbID           int
 }
 
 // InsertMedia inserts a new media record and returns the ID.

@@ -31,15 +31,14 @@ var junkPatterns = []*regexp.Regexp{
 
 var yearPattern = regexp.MustCompile(`\b((?:19|20)\d{2})\b`)
 var tvPattern = regexp.MustCompile(`(?i)S\d{1,2}E\d{1,2}|Season\s*\d+|Episode\s*\d+`)
-var multiDot = regexp.MustCompile(`\.{2,}`)
 var multiSpace = regexp.MustCompile(`\s{2,}`)
 
 // Result holds the cleaned information extracted from a filename.
 type Result struct {
 	CleanTitle string
 	Year       int
-	Type       string // "movie" or "tv"
 	Extension  string
+	Type       string // "movie" or "tv"
 }
 
 // IsVideoFile checks if the file has a video extension.
@@ -89,8 +88,8 @@ func Clean(filename string) Result {
 	return Result{
 		CleanTitle: cleaned,
 		Year:       year,
-		Type:       mediaType,
 		Extension:  strings.ToLower(ext),
+		Type:       mediaType,
 	}
 }
 

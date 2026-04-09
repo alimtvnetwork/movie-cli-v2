@@ -2,12 +2,12 @@ package db
 
 // MoveRecord represents a row in move_history.
 type MoveRecord struct {
-	ID               int64
-	MediaID          int64
 	FromPath         string
 	ToPath           string
 	OriginalFileName string
 	NewFileName      string
+	ID               int64
+	MediaID          int64
 	Undone           bool
 }
 
