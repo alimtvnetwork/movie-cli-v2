@@ -22,7 +22,7 @@ var (
 	BuildDate = "unknown"    // build date  e.g. "2024-06-01"
 )
 
-// Full returns the full version string printed by `mahin version`.
+// Full returns the full version string printed by `movie version`.
 //
 //	v1.2.0 (commit: abc1234, built: 2024-06-01)
 func Full() string {
