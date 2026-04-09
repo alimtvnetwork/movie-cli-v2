@@ -89,7 +89,7 @@
 - [ ] Clarify `movie ls` filter rule (scan-indexed items only)
 
 ### Phase 3: Enhancements (P3)
-- [ ] Batch move (`--all` flag for `movie move`)
+- [x] Batch move (`--all` flag for `movie move`) ✅ 09-Apr-2026
 - [ ] JSON metadata files per movie/TV show on scan
 - [ ] Use `DiscoverByGenre` in `movie suggest`
 - [ ] CI pipeline (lint, test, vuln scan) — follow gitmap-v2 pattern
