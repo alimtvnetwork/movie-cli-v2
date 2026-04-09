@@ -113,7 +113,7 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	}
 
 	// Build media record with full details
-	m := &db.Media{
+	m = &db.Media{
 		Title:       title,
 		CleanTitle:  title,
 		Year:        yearInt,
