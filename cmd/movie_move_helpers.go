@@ -261,5 +261,5 @@ func saveHistoryLog(basePath, title string, year int, fromPath, toPath string) {
 
 	filename := fmt.Sprintf("move-%s.json", time.Now().UTC().Format("20060102-150405"))
 	historyPath := filepath.Join(historyDir, filename)
-	os.WriteFile(historyPath, data, 0644)
+	_ = os.WriteFile(historyPath, data, 0644)
 }

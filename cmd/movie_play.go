@@ -25,14 +25,14 @@ func runMoviePlay(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
 	id, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "❌ Invalid ID.")
-		os.Exit(1)
+		return
 	}
 
 	m, err := database.GetMediaByID(id)

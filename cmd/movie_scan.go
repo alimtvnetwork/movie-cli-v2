@@ -28,7 +28,7 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
@@ -43,7 +43,7 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 		}
 		if scanDir == "" {
 			fmt.Fprintln(os.Stderr, "❌ No folder specified. Use: movie movie scan <folder>")
-			os.Exit(1)
+			return
 		}
 	}
 
