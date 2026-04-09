@@ -1,0 +1,66 @@
+# .golangci.yml — linter configuration for mahin CLI
+# Used by CI pipeline (.github/workflows/ci.yml) and local development.
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck        # unchecked errors
+    - govet           # go vet checks
+    - staticcheck     # advanced static analysis
+    - unused          # unused code
+    - gosimple        # simplifiable code
+    - ineffassign     # ineffectual assignments
+    - typecheck       # type-checking errors
+    - gocritic        # opinionated style checks
+    - gofmt           # formatting
+    - misspell        # spelling in comments/strings
+    - exportloopref   # loop variable capture bugs
+    - nilerr          # returning nil after checking err != nil
+    - bodyclose       # unclosed HTTP response bodies
+    - durationcheck   # incorrect time.Duration multiplications
+    - errorlint       # error wrapping best practices
+    - predeclared     # shadowing predeclared identifiers
+
+linters-settings:
+  gocritic:
+    enabled-checks:
+      - assignOp
+      - builtinShadow
+      - captLocal
+      - dupCase
+      - elseif
+      - ifElseChain
+      - rangeValCopy
+      - singleCaseSwitch
+      - sloppyLen
+      - underef
+      - unlambda
+      - unslice
+
+  errcheck:
+    check-blank: false
+    check-type-assertions: true
+
+  govet:
+    enable-all: true
+
+  misspell:
+    locale: US
+
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 5
+  exclude-rules:
+    # Allow fmt.Println/Printf in cmd/ (CLI output)
+    - path: cmd/
+      linters:
+        - errcheck
+      text: "fmt\\.Fprint"
+    # Test files are more relaxed
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gocritic
