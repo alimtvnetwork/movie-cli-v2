@@ -233,6 +233,11 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 			}
 		}
 
+		// Write JSON metadata file
+		if err := writeMediaJSON(database.BasePath, m); err != nil {
+			fmt.Fprintf(os.Stderr, "     ⚠️  JSON write error: %v\n", err)
+		}
+
 		if m.Type == "movie" {
 			movieCount++
 		} else {

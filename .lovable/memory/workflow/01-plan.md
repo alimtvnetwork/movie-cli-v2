@@ -90,7 +90,7 @@
 
 ### Phase 3: Enhancements (P3)
 - [x] Batch move (`--all` flag for `movie move`) ✅ 09-Apr-2026
-- [ ] JSON metadata files per movie/TV show on scan
+- [x] JSON metadata files per movie/TV show on scan ✅ 09-Apr-2026
 - [ ] Use `DiscoverByGenre` in `movie suggest`
 - [ ] CI pipeline (lint, test, vuln scan) — follow gitmap-v2 pattern
 
