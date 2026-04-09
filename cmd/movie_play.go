@@ -1,4 +1,4 @@
-// movie_play.go — mahin movie play <id>
+// movie_play.go — movie movie play <id>
 package cmd
 
 import (

@@ -1,4 +1,4 @@
-// movie_move.go — mahin movie move
+// movie_move.go — movie movie move
 package cmd
 
 import (

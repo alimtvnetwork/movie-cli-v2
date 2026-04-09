@@ -1,4 +1,4 @@
-// movie_undo.go — mahin movie undo
+// movie_undo.go — movie movie undo
 package cmd
 
 import (

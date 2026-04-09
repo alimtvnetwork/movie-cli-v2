@@ -1,4 +1,4 @@
-// movie_suggest.go — mahin movie suggest [N]
+// movie_suggest.go — movie movie suggest [N]
 package cmd
 
 import (
@@ -49,7 +49,7 @@ func runMovieSuggest(cmd *cobra.Command, args []string) {
 	}
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ TMDb API key required for suggestions.")
-		fmt.Fprintln(os.Stderr, "   Set with: mahin movie config set tmdb_api_key YOUR_KEY")
+		fmt.Fprintln(os.Stderr, "   Set with: movie movie config set tmdb_api_key YOUR_KEY")
 		os.Exit(1)
 	}
 

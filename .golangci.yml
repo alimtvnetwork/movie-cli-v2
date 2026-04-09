@@ -1,4 +1,4 @@
-# .golangci.yml — linter configuration for mahin CLI
+# .golangci.yml — linter configuration for movie CLI
 # Used by CI pipeline (.github/workflows/ci.yml) and local development.
 
 run:
