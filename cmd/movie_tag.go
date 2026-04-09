@@ -26,7 +26,11 @@ var tagAddCmd = &cobra.Command{
 	Short: "Add a tag to a media item",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		d := mustOpenDB()
+		d, err := db.Open()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
+			os.Exit(1)
+		}
 		defer d.Close()
 
 		id, err := strconv.Atoi(args[0])
@@ -70,7 +74,11 @@ var tagRemoveCmd = &cobra.Command{
 	Short: "Remove a tag from a media item",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		d := mustOpenDB()
+		d, err := db.Open()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
+			os.Exit(1)
+		}
 		defer d.Close()
 
 		id, err := strconv.Atoi(args[0])
@@ -110,7 +118,11 @@ var tagListCmd = &cobra.Command{
 	Short: "List tags (for a media item or all)",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		d := mustOpenDB()
+		d, err := db.Open()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
+			os.Exit(1)
+		}
 		defer d.Close()
 
 		if len(args) == 1 {
