@@ -76,17 +76,17 @@ Build for 6 platform/architecture combinations:
 ```bash
 CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build \
   -ldflags "-s -w \
-    -X 'github.com/mahin/mahin-cli-v2/version.Version=$VERSION' \
-    -X 'github.com/mahin/mahin-cli-v2/version.Commit=$COMMIT' \
-    -X 'github.com/mahin/mahin-cli-v2/version.BuildDate=$BUILD_DATE'" \
-  -o "dist/mahin-${VERSION}-${os}-${arch}${ext}" .
+    -X 'github.com/movie/movie-cli-v2/version.Version=$VERSION' \
+    -X 'github.com/movie/movie-cli-v2/version.Commit=$COMMIT' \
+    -X 'github.com/movie/movie-cli-v2/version.BuildDate=$BUILD_DATE'" \
+  -o "dist/movie-${VERSION}-${os}-${arch}${ext}" .
 ```
 
 ### Naming Convention
 
-- Binary: `mahin-{version}-{os}-{arch}{ext}`
-- Windows zip: `mahin-{version}-windows-{arch}.zip`
-- Unix tarball: `mahin-{version}-{os}-{arch}.tar.gz`
+- Binary: `movie-{version}-{os}-{arch}{ext}`
+- Windows zip: `movie-{version}-windows-{arch}.zip`
+- Unix tarball: `movie-{version}-{os}-{arch}.tar.gz`
 
 ---
 
@@ -121,9 +121,9 @@ irm https://github.com/REPO/releases/download/VERSION/install.ps1 | iex
 Features:
 - Auto-detect CPU architecture (amd64/arm64)
 - Download + SHA256 verification
-- Install to `$env:LOCALAPPDATA\mahin`
+- Install to `$env:LOCALAPPDATA\movie`
 - Add to user PATH
-- Verify installation by running `mahin version`
+- Verify installation by running `movie version`
 
 ### Bash (`install.sh`) — Linux / macOS
 
@@ -137,7 +137,7 @@ Features:
 - Download + SHA256 verification via `sha256sum` or `shasum`
 - Install to `~/.local/bin`
 - Add to shell rc file (bash/zsh/fish)
-- Verify installation by running `mahin version`
+- Verify installation by running `movie version`
 
 ### Placeholder Substitution
 

@@ -8,7 +8,7 @@
 
 ## Overview
 
-Standardized styling guide for all Mermaid flowchart diagrams in the mahin project. Ensures visual consistency, readable contrast in both light and dark themes, and semantic meaning through color.
+Standardized styling guide for all Mermaid flowchart diagrams in the movie project. Ensures visual consistency, readable contrast in both light and dark themes, and semantic meaning through color.
 
 ---
 

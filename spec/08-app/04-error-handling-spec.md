@@ -2,13 +2,13 @@
 
 **Version:** 1.0.0  
 **Created:** 09-Apr-2026  
-**Scope:** Runtime error handling for `mahin` CLI — TMDb API, SQLite, filesystem, and network failures
+**Scope:** Runtime error handling for `movie` CLI — TMDb API, SQLite, filesystem, and network failures
 
 ---
 
 ## 1. Overview
 
-This spec defines how the `mahin` CLI handles three categories of runtime errors:
+This spec defines how the `movie` CLI handles three categories of runtime errors:
 
 1. **TMDb API errors** — rate limits, auth failures, server errors
 2. **SQLite database errors** — locks, corruption, migration failures
@@ -32,7 +32,7 @@ This spec defines how the `mahin` CLI handles three categories of runtime errors
 | HTTP Status | Meaning | Behavior |
 |-------------|---------|----------|
 | `200` | Success | Process response normally |
-| `401` | Invalid API key | Print error + hint: `mahin movie config set tmdb_api_key YOUR_KEY` |
+| `401` | Invalid API key | Print error + hint: `movie movie config set tmdb_api_key YOUR_KEY` |
 | `404` | Resource not found | Treat as "no result" — do not retry |
 | `422` | Invalid parameters | Log warning, skip item |
 | `429` | Rate limit exceeded | Retry with backoff (see §2.2) |
@@ -123,7 +123,7 @@ SQLite in WAL mode rarely encounters BUSY, but it can happen with concurrent CLI
 GIVEN the database returns SQLITE_BUSY
 WHEN any write operation is attempted
 THEN the operation is retried up to 5 times with 200ms delay between attempts
-AND if all retries fail, an error is printed: "Database is locked. Another mahin process may be running."
+AND if all retries fail, an error is printed: "Database is locked. Another movie process may be running."
 ```
 
 **Implementation location:** `db/db.go` — add `PRAGMA busy_timeout = 5000` after WAL mode
@@ -143,8 +143,8 @@ GIVEN the database file is corrupted (SQLITE_CORRUPT)
 WHEN any command attempts to open the database
 THEN the error message includes:
   - The full path to the database file
-  - Suggestion: "Delete ~/movie-cli-output/mahin.db and re-scan your library"
-  - Note: "Thumbnails in ~/movie-cli-output/thumbnails/ are preserved"
+  - Suggestion: "Delete ~/data/movie.db and re-scan your library"
+  - Note: "Thumbnails in ~/data/thumbnails/ are preserved"
 ```
 
 ### 3.4 Migration Failure
@@ -160,7 +160,7 @@ AND the command exits with code 1
 ### 3.5 Acceptance Criteria
 
 ```
-GIVEN two mahin processes run simultaneously
+GIVEN two movie processes run simultaneously
 WHEN both attempt to write to the database
 THEN neither crashes — one waits via busy_timeout and succeeds
 
@@ -233,21 +233,21 @@ func isNetworkError(err error) bool {
 
 ```
 GIVEN the device has no internet connection
-WHEN mahin movie scan ~/Downloads is run
+WHEN movie movie scan ~/Downloads is run
 THEN files are scanned and stored with filename-only metadata
 AND a warning is printed: "Offline — metadata not fetched. Re-run scan when online to enrich."
 AND the summary shows how many items lack metadata
 
 GIVEN the device has no internet connection
-WHEN mahin movie search "Inception" is run
+WHEN movie movie search "Inception" is run
 THEN the command exits with: "Cannot reach TMDb. Check your network connection."
 
 GIVEN the device has no internet connection
-WHEN mahin movie ls is run
+WHEN movie movie ls is run
 THEN the list displays normally — no network dependency
 
 GIVEN TMDb is reachable but responds with timeout on 3 of 20 files
-WHEN mahin movie scan runs
+WHEN movie movie scan runs
 THEN 17 files get full metadata, 3 get filename-only records
 AND the summary reports: "3 items skipped due to network errors"
 ```
@@ -267,10 +267,10 @@ Examples:
 
 ```
 ❌ TMDb API error: 401 Unauthorized
-   Set your API key: mahin movie config set tmdb_api_key YOUR_KEY
+   Set your API key: movie movie config set tmdb_api_key YOUR_KEY
 
 ❌ Database error: database is locked
-   Another mahin process may be running. Wait and retry.
+   Another movie process may be running. Wait and retry.
 
 ❌ Cannot reach TMDb: no such host api.themoviedb.org
    Check your internet connection and try again.

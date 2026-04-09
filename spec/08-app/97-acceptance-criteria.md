@@ -9,7 +9,7 @@
 ## AC-01: Hello Command
 
 **GIVEN** the CLI is installed  
-**WHEN** the user runs `mahin hello`  
+**WHEN** the user runs `movie hello`  
 **THEN** the output contains `👋 Hello from Movie CLI!` followed by the version string
 
 ---
@@ -17,18 +17,18 @@
 ## AC-02: Version Command
 
 **GIVEN** the binary was built with `-ldflags` injecting version, commit, and build date  
-**WHEN** the user runs `mahin version`  
+**WHEN** the user runs `movie version`  
 **THEN** the output shows `vX.Y.Z (commit: <hash>, built: <date>)`
 
 **Edge Cases:**
-- **GIVEN** the binary was built without ldflags **WHEN** `mahin version` is run **THEN** defaults are shown: `v0.0.1-dev`, `none`, `unknown`
+- **GIVEN** the binary was built without ldflags **WHEN** `movie version` is run **THEN** defaults are shown: `v0.0.1-dev`, `none`, `unknown`
 
 ---
 
 ## AC-03: Self-Update Command
 
 **GIVEN** the CLI is run inside a clean git repository  
-**WHEN** the user runs `mahin self-update`  
+**WHEN** the user runs `movie self-update`  
 **THEN** `git pull --ff-only` is executed and the old→new commit hashes are displayed
 
 **Edge Cases:**
@@ -43,20 +43,20 @@
 ### AC-04a: Show All Config
 
 **GIVEN** config values exist in the database  
-**WHEN** `mahin movie config` is run with no arguments  
+**WHEN** `movie movie config` is run with no arguments  
 **THEN** all config keys and values are printed  
 **AND** the `tmdb_api_key` value is masked (first 4 + `...` + last 4 chars)
 
 ### AC-04b: Get Single Key
 
 **GIVEN** a config key `movies_dir` exists  
-**WHEN** `mahin movie config get movies_dir`  
+**WHEN** `movie movie config get movies_dir`  
 **THEN** the value of `movies_dir` is printed
 
 ### AC-04c: Set Key
 
 **GIVEN** a valid config key  
-**WHEN** `mahin movie config set movies_dir /new/path`  
+**WHEN** `movie movie config set movies_dir /new/path`  
 **THEN** the value is updated in the database  
 **AND** a confirmation message is printed
 
@@ -68,7 +68,7 @@
 ## AC-05: Scan Command
 
 **GIVEN** a directory contains video files and a TMDb API key is configured  
-**WHEN** `mahin movie scan /path/to/folder`  
+**WHEN** `movie movie scan /path/to/folder`  
 **THEN** each video file is cleaned, metadata is fetched from TMDb, a poster is downloaded, and a media record is inserted into the database  
 **AND** a summary is printed: total files, movies, TV shows, skipped  
 **AND** a `scan_history` record is logged
@@ -84,7 +84,7 @@
 ## AC-06: List Command
 
 **GIVEN** media records exist in the database  
-**WHEN** `mahin movie ls` is run  
+**WHEN** `movie movie ls` is run  
 **THEN** only records with a non-empty `current_file_path` are shown (file-backed items only)  
 **AND** records created via `search` or `info` without local files are excluded  
 **AND** a paginated list is shown with: number, clean title, year, rating (TMDb→IMDb fallback), type icon  
@@ -101,7 +101,7 @@
 ## AC-07: Search Command
 
 **GIVEN** a TMDb API key is configured  
-**WHEN** `mahin movie search "The Matrix"`  
+**WHEN** `movie movie search "The Matrix"`  
 **THEN** up to 15 results are displayed with: number, icon, title, year, rating, type  
 **AND** the user can select a result to fetch full details, download poster, and save to DB
 
@@ -117,20 +117,20 @@
 ### AC-08a: By Numeric ID
 
 **GIVEN** a media record with ID 5 exists in the DB  
-**WHEN** `mahin movie info 5`  
+**WHEN** `movie movie info 5`  
 **THEN** the full detail card is displayed (title, year, type, ratings, genres, director, cast, description, paths)
 
 ### AC-08b: By Title String
 
 **GIVEN** a media record titled "Inception" exists locally  
-**WHEN** `mahin movie info inception`  
+**WHEN** `movie movie info inception`  
 **THEN** the match is resolved using priority: exact match → prefix match → first result  
 **AND** the detail card is displayed
 
 ### AC-08c: Fallback to TMDb
 
 **GIVEN** the title is not found in the local DB and a TMDb API key exists  
-**WHEN** `mahin movie info "Unknown Title"`  
+**WHEN** `movie movie info "Unknown Title"`  
 **THEN** TMDb is searched, full details + credits + poster are fetched, the record is auto-saved, and the detail card is displayed
 
 **Edge Cases:**
@@ -141,7 +141,7 @@
 ## AC-09: Suggest Command
 
 **GIVEN** a TMDb API key is configured  
-**WHEN** `mahin movie suggest 5`  
+**WHEN** `movie movie suggest 5`  
 **THEN** the user is prompted to choose: Movie / TV / Random  
 **AND** 5 suggestions are displayed with: title, year, rating, genre names
 
@@ -166,7 +166,7 @@
 ## AC-10: Move Command
 
 **GIVEN** a source directory contains video files  
-**WHEN** `mahin movie move /path/to/source`  
+**WHEN** `movie movie move /path/to/source`  
 **THEN** video files are listed with clean titles, type icons, and file sizes  
 **AND** the user selects a file and destination (Movies / TV / Archive / Custom)  
 **AND** the file is renamed to `Title (Year).ext` and moved  
@@ -182,7 +182,7 @@
 ## AC-11: Rename Command
 
 **GIVEN** media records exist with `current_file_path` values  
-**WHEN** `mahin movie rename` is run  
+**WHEN** `movie movie rename` is run  
 **THEN** files whose names differ from `ToCleanFileName(cleanTitle, year, ext)` are listed as a preview  
 **AND** user confirms with `y/N`  
 **AND** confirmed renames are executed, DB paths updated, and `move_history` logged  
@@ -197,7 +197,7 @@
 ## AC-12: Undo Command
 
 **GIVEN** a `move_history` record exists with `undone=0`  
-**WHEN** `mahin movie undo` is run  
+**WHEN** `movie movie undo` is run  
 **THEN** the most recent move is displayed (from → to paths)  
 **AND** user confirms with `y/N`  
 **AND** the file is moved back, the record is marked `undone=1`, and `current_file_path` is restored
@@ -212,7 +212,7 @@
 ## AC-13: Play Command
 
 **GIVEN** a media record with ID 3 exists and `current_file_path` points to an existing file  
-**WHEN** `mahin movie play 3`  
+**WHEN** `movie movie play 3`  
 **THEN** the file is opened with the platform-specific command (`open` / `xdg-open` / `cmd /c start`)
 
 **Edge Cases:**
@@ -224,7 +224,7 @@
 ## AC-14: Stats Command
 
 **GIVEN** media records exist in the database  
-**WHEN** `mahin movie stats` is run  
+**WHEN** `movie movie stats` is run  
 **THEN** the output shows: total movies, total TV shows, total count  
 **AND** storage section shows: total file size, largest file, smallest file, average file size (human-readable format)  
 **AND** top 10 genres with visual bar chart (`█` characters, max 30 width)  
@@ -241,38 +241,38 @@
 ### AC-15a: Add Tag
 
 **GIVEN** media with ID 1 exists  
-**WHEN** `mahin movie tag add 1 favorite`  
+**WHEN** `movie movie tag add 1 favorite`  
 **THEN** the tag is inserted into the `tags` table  
 **AND** confirmation: `Tag "favorite" added to "Title (Year)"`
 
 ### AC-15b: Duplicate Tag
 
 **GIVEN** tag "favorite" already exists on media ID 1  
-**WHEN** `mahin movie tag add 1 favorite`  
+**WHEN** `movie movie tag add 1 favorite`  
 **THEN** error: `tag already exists`
 
 ### AC-15c: Remove Tag
 
 **GIVEN** tag "favorite" exists on media ID 1  
-**WHEN** `mahin movie tag remove 1 favorite`  
+**WHEN** `movie movie tag remove 1 favorite`  
 **THEN** the tag is deleted and confirmation is printed
 
 ### AC-15d: Remove Non-Existent Tag
 
 **GIVEN** tag "unknown" does not exist on media ID 1  
-**WHEN** `mahin movie tag remove 1 unknown`  
+**WHEN** `movie movie tag remove 1 unknown`  
 **THEN** error: `tag not found`
 
 ### AC-15e: List Tags for Media
 
 **GIVEN** tags exist on media ID 1  
-**WHEN** `mahin movie tag list 1`  
+**WHEN** `movie movie tag list 1`  
 **THEN** all tags for that media are shown
 
 ### AC-15f: List All Tags
 
 **GIVEN** tags exist across multiple media  
-**WHEN** `mahin movie tag list` (no ID)  
+**WHEN** `movie movie tag list` (no ID)  
 **THEN** all unique tags are shown with media count, e.g., `favorite (3)`
 
 ---

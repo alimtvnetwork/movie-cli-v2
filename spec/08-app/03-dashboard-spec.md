@@ -9,7 +9,7 @@
 
 ## 1. Purpose
 
-Build a web-based dashboard that reads media records from the SQLite database populated by `mahin movie scan` (and other ingestion commands), and renders them as a browsable, filterable, card-based interface.
+Build a web-based dashboard that reads media records from the SQLite database populated by `movie movie scan` (and other ingestion commands), and renders them as a browsable, filterable, card-based interface.
 
 ---
 
@@ -273,7 +273,7 @@ interface MediaItem {
 | Rating display | Star icon + numeric value, colored by quality (green ≥7, yellow ≥5, red <5) |
 | Type badge | Movie = blue badge, TV = purple badge |
 | Responsive | 1 col mobile, 2 col tablet, 3-4 col desktop |
-| Empty state | "No media found. Run `mahin movie scan` to get started." |
+| Empty state | "No media found. Run `movie movie scan` to get started." |
 
 ### 5.4 Theme
 
@@ -291,12 +291,12 @@ Use existing design system tokens from `index.css` and `tailwind.config.ts`. Car
 Since this is a Lovable web project and the Go CLI writes to a local SQLite file, the dashboard needs a data bridge. Options:
 
 ### 6.1 Option A: Static JSON Export (Recommended for Phase 1)
-- Add a `mahin movie export` command that dumps the `media` table as JSON to a known location
+- Add a `movie movie export` command that dumps the `media` table as JSON to a known location
 - Dashboard loads this JSON file
 - Simple, no backend needed, works with existing infrastructure
 
 ### 6.2 Option B: REST API (Future)
-- Add a `mahin movie serve` command that starts a local HTTP server
+- Add a `movie movie serve` command that starts a local HTTP server
 - Exposes `/api/media`, `/api/stats`, `/api/genres` endpoints
 - Dashboard fetches from localhost
 
