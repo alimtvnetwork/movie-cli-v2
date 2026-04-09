@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/icon.png" alt="Movie CLI icon" width="80" height="80">
+
 # 🎬 Movie CLI
 
 **Personal movie & TV show library manager — from the terminal**
