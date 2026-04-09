@@ -710,11 +710,29 @@ Resolve-Dependencies
 
 $builtBinary = Build-Binary
 
+$deployedBinary = $null
 if (-not $NoDeploy) {
     $deployedBinary = Deploy-Binary -SourceBinary $builtBinary
 } else {
     Write-Info "Skipping deploy (-NoDeploy)"
     $deployedBinary = $builtBinary
+}
+
+# Show deployed version
+$activeBinary = $deployedBinary
+$activeCmd = Get-Command mahin -ErrorAction SilentlyContinue
+if ($activeCmd -and (Test-Path $activeCmd.Source)) {
+    $activeBinary = $activeCmd.Source
+}
+
+if ($activeBinary -and (Test-Path $activeBinary)) {
+    $prevPref = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $finalVersion = & $activeBinary version 2>&1
+    $ErrorActionPreference = $prevPref
+    $finalVersionText = "$finalVersion".Trim()
+} else {
+    $finalVersionText = "unknown"
 }
 
 # Run mode
@@ -723,6 +741,19 @@ if ($R) {
     Invoke-Run -BinaryPath $deployedBinary -Arguments $RunArgs
 }
 
+# -- Summary ---------------------------------------------------
 Write-Host ""
-Write-Success "Done — all phases complete"
+Write-Host " +======================================+" -ForegroundColor DarkCyan
+Write-Host " | " -ForegroundColor DarkCyan -NoNewline
+Write-Host "All done!" -ForegroundColor Green -NoNewline
+Write-Host "                       |" -ForegroundColor DarkCyan
+Write-Host " +--------------------------------------+" -ForegroundColor DarkCyan
+Write-Host " | " -ForegroundColor DarkCyan -NoNewline
+Write-Host "Version: $finalVersionText" -ForegroundColor Cyan -NoNewline
+# Pad to align closing pipe
+$pad = 37 - ("Version: $finalVersionText").Length
+if ($pad -lt 1) { $pad = 1 }
+Write-Host (" " * $pad) -NoNewline
+Write-Host "|" -ForegroundColor DarkCyan
+Write-Host " +======================================+" -ForegroundColor DarkCyan
 Write-Host ""
