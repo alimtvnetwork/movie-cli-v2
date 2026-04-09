@@ -63,29 +63,36 @@
 - [x] Phase 7: install.ps1 bootstrap script
 - [x] Phase 8: README.md automation docs update
 
+### Release Pipeline & Install Scripts (09-Apr-2026) ✅
+- [x] GitHub Actions release.yml — triggers on `release/**` branches and `v*` tags
+- [x] Cross-compiled binaries for 6 targets (windows/linux/darwin × amd64/arm64)
+- [x] Version-specific install.ps1 (Windows) with SHA256 verification
+- [x] Version-specific install.sh (Linux/macOS) with SHA256 verification
+- [x] Release page with changelog, checksums, install instructions, asset table
+- [x] CHANGELOG.md created for release note extraction
+- [x] Pipeline spec documentation (`spec/pipeline/`)
+
+### CLI UX Improvements (09-Apr-2026) ✅
+- [x] Root command shows version + comprehensive help with examples
+- [x] `mahin --version` flag support
+- [x] `mahin version` shows Go version and OS/arch
+- [x] `mahin movie` shows categorized subcommand help with examples
+
 ---
 
 ## 🔲 Pending — Prioritized Backlog
 
 ### Phase 1: Safety & Reliability (P0)
-- [ ] Cross-drive move fallback — copy+delete when `os.Rename` fails
 - [ ] `movie undo` confirmation prompt before reverting
 
 ### Phase 2: Spec Completeness (P1)
-- [x] Add GIVEN/WHEN/THEN acceptance criteria to spec.md for each command
-- [x] Document shared helper locations in code comments
 - [ ] Clarify `movie ls` filter rule (scan-indexed items only)
 
-### Phase 3: New Features (P2)
-- [x] `movie tag` command — add/remove/list tags (table exists)
-- [x] File size stats in `movie stats` (total, average, largest)
-- [x] Error handling spec (TMDb rate limits, DB locks, offline mode)
-- [x] Update README.md with full movie management documentation
-
-### Phase 4: Enhancements (P3)
+### Phase 3: Enhancements (P3)
 - [ ] Batch move (`--all` flag for `movie move`)
 - [ ] JSON metadata files per movie/TV show on scan
 - [ ] Use `DiscoverByGenre` in `movie suggest`
+- [ ] CI pipeline (lint, test, vuln scan) — follow gitmap-v2 pattern
 
 ---
 
@@ -93,9 +100,9 @@
 
 Pick one of these to implement next:
 
-1. **Cross-drive move fallback** — Detect `os.Rename` error, fallback to `io.Copy` + `os.Remove`. Affects `cmd/movie_move.go`.
-2. **Undo confirmation prompt** — Add `[y/N]` prompt before reverting. Affects `cmd/movie_undo.go`.
-3. **File size stats** — Add total/average/largest file size to `movie stats`.
-4. **Acceptance criteria** — Add GIVEN/WHEN/THEN blocks to spec.md §4 for each of the 11 movie commands.
+1. **Undo confirmation prompt** — Add `[y/N]` prompt before reverting. Affects `cmd/movie_undo.go`.
+2. **Movie ls filter clarification** — Document that only file-backed items show.
+3. **CI pipeline** — Add `.github/workflows/ci.yml` with lint, test, vuln scan.
+4. **Batch move** — Add `--all` flag to `movie move`.
 
 *Tell me which task to implement.*
