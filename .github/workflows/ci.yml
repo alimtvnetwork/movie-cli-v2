@@ -262,7 +262,7 @@ jobs:
             -X 'github.com/mahin/mahin-cli-v2/version.Version=$VERSION' \
             -X 'github.com/mahin/mahin-cli-v2/version.Commit=${GITHUB_SHA::10}' \
             -X 'github.com/mahin/mahin-cli-v2/version.BuildDate=$(date -u +%Y-%m-%d)'"
-          OUTPUT="mahin-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}"
+          OUTPUT="movie-${VERSION}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.ext }}"
           CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "$LDFLAGS" -o "$OUTPUT" .
           echo "Built: $OUTPUT ($(stat --format='%s' "$OUTPUT" | numfmt --to=iec --suffix=B))"
 
@@ -270,8 +270,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: needs.sha-check.outputs.already-built != 'true'
         with:
-          name: mahin-${{ matrix.os }}-${{ matrix.arch }}
-          path: mahin-*
+          name: movie-${{ matrix.os }}-${{ matrix.arch }}
+          path: movie-*
           retention-days: 14
 
   # ─── Build summary ─────────────────────────────────────────
