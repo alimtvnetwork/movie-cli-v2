@@ -35,7 +35,8 @@ movie
     ├── undo                      # Revert last move/rename
     ├── play <id>                 # Open with default video player
     ├── stats                     # Counts, storage, genre chart, avg ratings
-    └── tag [add|remove|list]     # Manage user-defined tags
+    ├── tag [add|remove|list]     # Manage user-defined tags
+    └── export [-o path]          # Dump media table as JSON
 ```
 
 ---
