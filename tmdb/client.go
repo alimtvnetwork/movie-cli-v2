@@ -286,3 +286,12 @@ var genreMap = map[int]string{
 	10764: "Reality", 10765: "Sci-Fi & Fantasy", 10766: "Soap",
 	10767: "Talk", 10768: "War & Politics",
 }
+
+// GenreNameToID returns a reverse map of genre name → TMDb genre ID.
+func GenreNameToID() map[string]int {
+	m := make(map[string]int, len(genreMap))
+	for id, name := range genreMap {
+		m[name] = id
+	}
+	return m
+}
