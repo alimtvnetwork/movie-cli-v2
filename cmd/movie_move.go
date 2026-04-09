@@ -15,6 +15,8 @@ import (
 	"github.com/mahin/mahin-cli-v1/db"
 )
 
+var moveAllFlag bool
+
 var movieMoveCmd = &cobra.Command{
 	Use:   "move [directory]",
 	Short: "Browse a local directory and move a movie/TV show file",
@@ -22,9 +24,16 @@ var movieMoveCmd = &cobra.Command{
 to a configured destination (Movies, TV Shows, Archive, or custom path).
 The move is logged for undo support.
 
+Use --all to move all video files at once. Movies go to movies_dir,
+TV shows go to tv_dir (auto-detected from filename).
+
 If no directory is given, you'll be prompted to choose one.`,
 	Args: cobra.MaximumNArgs(1),
 	Run:  runMovieMove,
+}
+
+func init() {
+	movieMoveCmd.Flags().BoolVar(&moveAllFlag, "all", false, "Move all video files in the directory at once")
 }
 
 func runMovieMove(cmd *cobra.Command, args []string) {
@@ -67,6 +76,121 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	if moveAllFlag {
+		runBatchMove(database, scanner, sourceDir, files, home)
+		return
+	}
+
+	runInteractiveMove(database, scanner, sourceDir, files, home)
+}
+
+// runBatchMove moves all video files at once, auto-routing by type.
+func runBatchMove(database *db.DB, scanner *bufio.Scanner, sourceDir string, files []os.FileInfo, home string) {
+	moviesDir, _ := database.GetConfig("movies_dir")
+	tvDir, _ := database.GetConfig("tv_dir")
+	moviesDir = expandHome(moviesDir, home)
+	tvDir = expandHome(tvDir, home)
+
+	if moviesDir == "" {
+		moviesDir = expandHome("~/Movies", home)
+	}
+	if tvDir == "" {
+		tvDir = expandHome("~/TVShows", home)
+	}
+
+	// Preview all moves
+	type moveItem struct {
+		srcPath   string
+		destPath  string
+		destDir   string
+		cleanName string
+		result    cleaner.CleanResult
+		fileInfo  os.FileInfo
+	}
+
+	var moves []moveItem
+
+	fmt.Printf("\n🎬 Batch move — %d video files in: %s\n\n", len(files), sourceDir)
+	fmt.Println("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+	for _, f := range files {
+		result := cleaner.Clean(f.Name())
+		cleanName := cleaner.ToCleanFileName(result.CleanTitle, result.Year, result.Extension)
+
+		destDir := moviesDir
+		typeIcon := "🎬"
+		if result.Type == "tv" {
+			destDir = tvDir
+			typeIcon = "📺"
+		}
+
+		srcPath := filepath.Join(sourceDir, f.Name())
+		destPath := filepath.Join(destDir, cleanName)
+
+		yearStr := ""
+		if result.Year > 0 {
+			yearStr = fmt.Sprintf(" (%d)", result.Year)
+		}
+
+		fmt.Printf("  %s %s%s  [%s]\n", typeIcon, result.CleanTitle, yearStr, humanSize(f.Size()))
+		fmt.Printf("     → %s\n", destPath)
+
+		moves = append(moves, moveItem{
+			srcPath:   srcPath,
+			destPath:  destPath,
+			destDir:   destDir,
+			cleanName: cleanName,
+			result:    result,
+			fileInfo:  f,
+		})
+	}
+
+	fmt.Println("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Printf("\n  Move all %d files? [y/N]: ", len(moves))
+
+	if !scanner.Scan() {
+		return
+	}
+	confirm := strings.ToLower(strings.TrimSpace(scanner.Text()))
+	if confirm != "y" && confirm != "yes" {
+		fmt.Println("  ❌ Batch move cancelled.")
+		return
+	}
+
+	// Execute all moves
+	success := 0
+	failed := 0
+
+	for _, m := range moves {
+		// Create destination directory
+		if err := os.MkdirAll(m.destDir, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "  ❌ Cannot create dir %s: %v\n", m.destDir, err)
+			failed++
+			continue
+		}
+
+		// Move file
+		if err := MoveFile(m.srcPath, m.destPath); err != nil {
+			fmt.Fprintf(os.Stderr, "  ❌ Failed: %s — %v\n", m.fileInfo.Name(), err)
+			failed++
+			continue
+		}
+
+		// Track in DB
+		trackMove(database, m.result, m.fileInfo, m.srcPath, m.destPath, m.cleanName)
+		success++
+	}
+
+	fmt.Println()
+	if failed == 0 {
+		fmt.Printf("  ✅ All %d files moved successfully!\n", success)
+	} else {
+		fmt.Printf("  ⚠️  %d moved, %d failed\n", success, failed)
+	}
+}
+
+// runInteractiveMove is the original single-file interactive flow.
+func runInteractiveMove(database *db.DB, scanner *bufio.Scanner, sourceDir string, files []os.FileInfo, home string) {
 	fmt.Printf("\n🎬 Video files in: %s\n\n", sourceDir)
 	for i, f := range files {
 		result := cleaner.Clean(f.Name())
@@ -81,7 +205,7 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 		fmt.Printf("  %2d. %s %s %s  [%s]\n", i+1, typeIcon, result.CleanTitle, yearStr, humanSize(f.Size()))
 	}
 
-	// Step 3: Select a file
+	// Select a file
 	fmt.Println()
 	fmt.Print("  Select file [number]: ")
 	if !scanner.Scan() {
@@ -103,13 +227,13 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 	}
 	fmt.Printf("  Type:     %s\n", result.Type)
 
-	// Step 4: Choose destination
+	// Choose destination
 	destDir := promptDestination(scanner, database, home)
 	if destDir == "" {
 		return
 	}
 
-	// Step 5: Build clean filename and confirm
+	// Build clean filename and confirm
 	cleanName := cleaner.ToCleanFileName(result.CleanTitle, result.Year, result.Extension)
 	destPath := filepath.Join(destDir, cleanName)
 
@@ -130,26 +254,36 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Step 6: Create destination directory
+	// Create destination directory
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "  ❌ Cannot create directory: %v\n", err)
 		return
 	}
 
-	// Step 7: Move the file
+	// Move the file
 	if err := MoveFile(selectedPath, destPath); err != nil {
 		fmt.Fprintf(os.Stderr, "  ❌ Move failed: %v\n", err)
 		return
 	}
 
-	// Step 8: Track history for undo
+	// Track history
+	trackMove(database, result, selectedFile, selectedPath, destPath, cleanName)
+
+	fmt.Println()
+	fmt.Println("  ✅ Moved successfully!")
+	fmt.Printf("     %s\n", selectedPath)
+	fmt.Printf("     → %s\n", destPath)
+}
+
+// trackMove records a move in the database and JSON history log.
+func trackMove(database *db.DB, result cleaner.CleanResult, fileInfo os.FileInfo, srcPath, destPath, cleanName string) {
 	var mediaID int64
 	existing, searchErr := database.SearchMedia(result.CleanTitle)
 	if searchErr != nil {
 		fmt.Fprintf(os.Stderr, "  ⚠️  DB search error: %v\n", searchErr)
 	}
 	for _, e := range existing {
-		if e.CurrentFilePath == selectedPath || e.OriginalFilePath == selectedPath {
+		if e.CurrentFilePath == srcPath || e.OriginalFilePath == srcPath {
 			mediaID = e.ID
 			break
 		}
@@ -161,11 +295,11 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 			CleanTitle:       result.CleanTitle,
 			Year:             result.Year,
 			Type:             result.Type,
-			OriginalFileName: selectedFile.Name(),
-			OriginalFilePath: selectedPath,
+			OriginalFileName: fileInfo.Name(),
+			OriginalFilePath: srcPath,
 			CurrentFilePath:  destPath,
 			FileExtension:    result.Extension,
-			FileSize:         selectedFile.Size(),
+			FileSize:         fileInfo.Size(),
 		}
 		var insertErr error
 		mediaID, insertErr = database.InsertMedia(m)
@@ -179,17 +313,11 @@ func runMovieMove(cmd *cobra.Command, args []string) {
 	}
 
 	if mediaID > 0 {
-		if err := database.InsertMoveHistory(mediaID, selectedPath, destPath,
-			selectedFile.Name(), cleanName); err != nil {
+		if err := database.InsertMoveHistory(mediaID, srcPath, destPath,
+			fileInfo.Name(), cleanName); err != nil {
 			fmt.Fprintf(os.Stderr, "  ⚠️  DB history error: %v\n", err)
 		}
 	}
 
-	saveHistoryLog(database.BasePath, result.CleanTitle, result.Year,
-		selectedPath, destPath)
-
-	fmt.Println()
-	fmt.Println("  ✅ Moved successfully!")
-	fmt.Printf("     %s\n", selectedPath)
-	fmt.Printf("     → %s\n", destPath)
+	saveHistoryLog(database.BasePath, result.CleanTitle, result.Year, srcPath, destPath)
 }
