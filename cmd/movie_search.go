@@ -1,4 +1,4 @@
-// movie_search.go — mahin movie search <name>
+// movie_search.go — movie movie search <name>
 // Searches TMDb API, fetches full details, and saves to local database.
 package cmd
 
@@ -45,7 +45,7 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 	}
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ No TMDb API key configured.")
-		fmt.Fprintln(os.Stderr, "   Set it with: mahin movie config set tmdb_api_key YOUR_KEY")
+		fmt.Fprintln(os.Stderr, "   Set it with: movie movie config set tmdb_api_key YOUR_KEY")
 		os.Exit(1)
 	}
 

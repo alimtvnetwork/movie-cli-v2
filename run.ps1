@@ -105,7 +105,7 @@ function Load-Config {
     return @{
         deployPath  = "E:\bin-run"
         buildOutput = "./bin"
-        binaryName  = "mahin.exe"
+        binaryName  = "movie.exe"
         copyData    = $false
     }
 }
@@ -720,7 +720,7 @@ if (-not $NoDeploy) {
 
 # Show deployed version
 $activeBinary = $deployedBinary
-$activeCmd = Get-Command mahin -ErrorAction SilentlyContinue
+$activeCmd = Get-Command movie -ErrorAction SilentlyContinue
 if ($activeCmd -and (Test-Path $activeCmd.Source)) {
     $activeBinary = $activeCmd.Source
 }

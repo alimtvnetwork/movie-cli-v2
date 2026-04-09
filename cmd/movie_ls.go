@@ -1,4 +1,4 @@
-// movie_ls.go — mahin movie ls
+// movie_ls.go — movie movie ls
 package cmd
 
 import (
@@ -16,7 +16,7 @@ var movieLsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List scanned movies and TV shows from your library",
 	Long: `Lists scan-indexed movies and TV shows (items with a known file path).
-Only items added via 'mahin movie scan' are shown.
+Only items added via 'movie movie scan' are shown.
 Press N for next page, P for previous, Q to quit.`,
 	Run: runMovieLs,
 }
@@ -44,7 +44,7 @@ func runMovieLs(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	if total == 0 {
-		fmt.Println("📭 No media found. Run 'mahin movie scan <folder>' first.")
+		fmt.Println("📭 No media found. Run 'movie movie scan <folder>' first.")
 		return
 	}
 

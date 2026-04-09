@@ -1,4 +1,4 @@
-// movie_scan.go — mahin movie scan <folder>
+// movie_scan.go — movie movie scan <folder>
 package cmd
 
 import (
@@ -42,7 +42,7 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", err)
 		}
 		if scanDir == "" {
-			fmt.Fprintln(os.Stderr, "❌ No folder specified. Use: mahin movie scan <folder>")
+			fmt.Fprintln(os.Stderr, "❌ No folder specified. Use: movie movie scan <folder>")
 			os.Exit(1)
 		}
 	}
@@ -74,7 +74,7 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 	}
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "⚠️  No TMDb API key configured.")
-		fmt.Fprintln(os.Stderr, "   Set it with: mahin movie config set tmdb_api_key YOUR_KEY")
+		fmt.Fprintln(os.Stderr, "   Set it with: movie movie config set tmdb_api_key YOUR_KEY")
 		fmt.Fprintln(os.Stderr, "   Or set TMDB_API_KEY environment variable.")
 		fmt.Fprintln(os.Stderr, "   Scanning will proceed without metadata fetching.")
 		fmt.Println()

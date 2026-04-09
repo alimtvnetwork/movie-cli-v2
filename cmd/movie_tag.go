@@ -1,4 +1,4 @@
-// movie_tag.go — mahin movie tag [add|remove|list]
+// movie_tag.go — movie movie tag [add|remove|list]
 package cmd
 
 import (

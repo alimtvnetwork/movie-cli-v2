@@ -1,4 +1,4 @@
-// movie_rename.go — mahin movie rename
+// movie_rename.go — movie movie rename
 package cmd
 
 import (

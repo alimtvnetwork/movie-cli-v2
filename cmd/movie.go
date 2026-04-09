@@ -1,4 +1,4 @@
-// movie.go — parent command: mahin movie
+// movie.go — parent command: movie movie
 package cmd
 
 import (
@@ -36,12 +36,12 @@ Configuration:
   config set <key> <val>  Set a configuration value (e.g., tmdb-key)
 
 Examples:
-  mahin movie scan ~/Movies
-  mahin movie ls --page 2
-  mahin movie search "The Matrix"
-  mahin movie info 42
-  mahin movie suggest --genre action
-  mahin movie tag add 1 favorite`,
+  movie movie scan ~/Movies
+  movie movie ls --page 2
+  movie movie search "The Matrix"
+  movie movie info 42
+  movie movie suggest --genre action
+  movie movie tag add 1 favorite`,
 }
 
 func init() {

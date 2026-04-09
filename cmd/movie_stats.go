@@ -1,4 +1,4 @@
-// movie_stats.go — mahin movie stats
+// movie_stats.go — movie movie stats
 package cmd
 
 import (
@@ -41,7 +41,7 @@ func runMovieStats(cmd *cobra.Command, args []string) {
 	}
 
 	if total == 0 {
-		fmt.Println("📭 No media in library. Run 'mahin movie scan <folder>' first.")
+		fmt.Println("📭 No media in library. Run 'movie movie scan <folder>' first.")
 		return
 	}
 

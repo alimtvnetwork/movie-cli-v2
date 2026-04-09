@@ -1,4 +1,4 @@
-// movie_info.go — mahin movie info <id-or-title>
+// movie_info.go — movie movie info <id-or-title>
 //
 // Accepts a numeric ID (from library) or a title string.
 // Checks local DB first; if not found by title, falls back to TMDb API,
@@ -74,7 +74,7 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	}
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ No TMDb API key configured.")
-		fmt.Fprintln(os.Stderr, "   Set it with: mahin movie config set tmdb_api_key YOUR_KEY")
+		fmt.Fprintln(os.Stderr, "   Set it with: movie movie config set tmdb_api_key YOUR_KEY")
 		os.Exit(1)
 	}
 
