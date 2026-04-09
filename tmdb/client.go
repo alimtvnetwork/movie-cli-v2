@@ -36,6 +36,7 @@ func NewClient(apiKey string) *Client {
 
 // SearchResult holds a search result from TMDb.
 type SearchResult struct {
+	GenreIDs    []int   `json:"genre_ids"`
 	Overview    string  `json:"overview"`
 	Title       string  `json:"title"`
 	Name        string  `json:"name"`
@@ -46,7 +47,6 @@ type SearchResult struct {
 	VoteAvg     float64 `json:"vote_average"`
 	Popularity  float64 `json:"popularity"`
 	ID          int     `json:"id"`
-	GenreIDs    []int   `json:"genre_ids"`
 }
 
 type searchResponse struct {
@@ -55,6 +55,7 @@ type searchResponse struct {
 
 // MovieDetails holds detailed movie info.
 type MovieDetails struct {
+	Genres      []Genre `json:"genres"`
 	Title       string  `json:"title"`
 	Overview    string  `json:"overview"`
 	ReleaseDate string  `json:"release_date"`
@@ -64,11 +65,11 @@ type MovieDetails struct {
 	Popularity  float64 `json:"popularity"`
 	ID          int     `json:"id"`
 	Runtime     int     `json:"runtime"`
-	Genres      []Genre `json:"genres"`
 }
 
 // TVDetails holds detailed TV show info.
 type TVDetails struct {
+	Genres       []Genre `json:"genres"`
 	Name         string  `json:"name"`
 	Overview     string  `json:"overview"`
 	FirstAirDate string  `json:"first_air_date"`
@@ -77,7 +78,6 @@ type TVDetails struct {
 	Popularity   float64 `json:"popularity"`
 	ID           int     `json:"id"`
 	Seasons      int     `json:"number_of_seasons"`
-	Genres       []Genre `json:"genres"`
 }
 
 // Genre is a TMDb genre.
