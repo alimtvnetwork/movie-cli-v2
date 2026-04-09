@@ -1,21 +1,251 @@
-# Movie CLI
+<div align="center">
 
-A cross-platform CLI tool for managing a personal movie and TV show library. Scans local folders for video files, cleans messy filenames, fetches metadata from TMDb, stores everything in SQLite, and organizes files into configured directories.
+# 🎬 Movie CLI
 
-## Features
+**Personal movie & TV show library manager — from the terminal**
 
-- **Scan** local folders for video files and auto-fetch metadata from TMDb
-- **Search** TMDb directly and save results to your library
-- **List** your library with paginated, interactive browsing
-- **Move** and **rename** files with clean naming (`Title (Year).ext`)
-- **Undo** any move/rename operation
-- **Play** media files with your system's default player
-- **Suggest** new content based on your library's genre patterns or trending
-- **Tag** media with custom labels for organization
-- **Stats** with genre charts, storage usage, and average ratings
-- **Self-update** via `git pull --ff-only`
+[![CI](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml)
+[![golangci-lint](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/mahin/movie-cli-v2?style=flat-square&label=version)](https://github.com/mahin/movie-cli-v2/releases)
+[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](https://github.com/mahin/movie-cli-v2)
+[![SQLite](https://img.shields.io/badge/SQLite-WAL-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/license-Private-red?style=flat-square)](https://github.com/mahin/movie-cli-v2)
 
-## Commands
+_Scan folders, clean filenames, fetch TMDb metadata, organize files, and track your collection._
+
+</div>
+
+---
+
+<div align="center">
+
+## Quick Start
+
+</div>
+
+### Install
+
+```
+# Windows (PowerShell)
+irm https://github.com/mahin/movie-cli-v2/releases/latest/download/install.ps1 | iex
+```
+
+```
+# Linux / macOS
+curl -fsSL https://github.com/mahin/movie-cli-v2/releases/latest/download/install.sh | bash
+```
+
+### Set up & scan
+
+```bash
+movie movie config set tmdb_api_key YOUR_KEY
+movie movie scan ~/Downloads
+movie movie ls
+```
+
+### Search & discover
+
+```bash
+movie movie search "Inception"
+movie movie suggest 5
+```
+
+Every command supports `--help` or `-h` for detailed usage.
+
+---
+
+<div align="center">
+
+## Installation
+
+</div>
+
+### One-Liner Install (recommended)
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://github.com/mahin/movie-cli-v2/releases/latest/download/install.ps1 | iex
+```
+
+**Linux / macOS (Bash):**
+
+```bash
+curl -fsSL https://github.com/mahin/movie-cli-v2/releases/latest/download/install.sh | bash
+```
+
+### Installer Options
+
+**Windows (PowerShell):**
+
+| Flag | Description | Example |
+|---|---|---|
+| `-InstallDir` | Custom install directory | `-InstallDir C:\tools\movie` |
+| `-Arch` | Force architecture (`amd64`, `arm64`) | `-Arch arm64` |
+| `-NoPath` | Skip adding to user PATH | `-NoPath` |
+
+**Linux / macOS (Bash):**
+
+| Flag | Description | Example |
+|---|---|---|
+| `--dir` | Custom install directory | `--dir ~/bin` |
+| `--arch` | Force architecture (`amd64`, `arm64`) | `--arch arm64` |
+| `--no-path` | Skip adding to PATH | `--no-path` |
+
+### Clone & Build (Development)
+
+**Prerequisites:**
+
+| Requirement | Minimum | Check |
+|---|---|---|
+| **Go** | 1.22+ | `go version` |
+| **Git** | 2.x | `git --version` |
+| **PowerShell** | 5.1+ (Win) / 7+ (Unix) | `$PSVersionTable.PSVersion` |
+
+```bash
+git clone https://github.com/mahin/movie-cli-v2.git
+cd movie-cli-v2
+pwsh run.ps1
+```
+
+**Using the bootstrap installer:**
+
+```powershell
+pwsh install.ps1                      # Fresh install (clone + build + deploy)
+pwsh install.ps1 -DeployPath ~/bin    # Custom deploy path
+```
+
+### Verify
+
+```bash
+movie version
+# v1.0.0 (commit: abc1234, built: 2026-04-09)
+#   Go:   go1.22.0
+#   OS:   linux/amd64
+```
+
+> **Tip:** If `movie` is not found, add the deploy path to your `PATH`.
+> Default: `E:\bin-run` (Windows) or `/usr/local/bin` (Unix) for source builds.
+
+---
+
+<div align="center">
+
+## What It Does
+
+</div>
+
+A portable CLI that manages your personal movie and TV show library entirely from the terminal. Every scan produces:
+
+- **Database** — structured metadata in SQLite (WAL mode)
+- **Thumbnails** — poster images downloaded from TMDb
+- **JSON** — per-file metadata written to `./data/json/`
+- **Clean filenames** — `Scream.2022.1080p.WEBRip.x264.mkv` → `Scream (2022).mkv`
+
+All data lives in `./data/` at the project root.
+
+---
+
+<div align="center">
+
+## Command Reference
+
+</div>
+
+### Scanning & Library
+
+| Command | Description |
+|---|---|
+| `movie movie scan [folder]` | Scan folder → DB + TMDb metadata |
+| `movie movie ls` | Paginated interactive library browser |
+| `movie movie search <name>` | Live TMDb search → save to DB |
+| `movie movie info <id\|title>` | Detail view (local DB → TMDb fallback) |
+
+```bash
+movie movie scan ~/Downloads
+movie movie ls
+movie movie search "Inception"
+movie movie info 1
+```
+
+---
+
+### File Management
+
+| Command | Description |
+|---|---|
+| `movie movie move [directory]` | Browse, select, move with clean name |
+| `movie movie move --all` | Batch move all files (auto-route by type) |
+| `movie movie rename` | Batch rename to clean format |
+| `movie movie undo` | Revert last move/rename |
+| `movie movie play <id>` | Open with default video player |
+
+```bash
+movie movie move ~/Downloads        # interactive single-file
+movie movie move --all ~/Downloads  # batch move all
+movie movie rename                  # clean all filenames
+movie movie undo                    # revert last operation
+movie movie play 1                  # play with system player
+```
+
+---
+
+### Discovery & Organization
+
+| Command | Description |
+|---|---|
+| `movie movie suggest [N]` | Genre-based recommendations + trending |
+| `movie movie tag add <id> <tag>` | Add a tag to a media item |
+| `movie movie tag remove <id> <tag>` | Remove a tag |
+| `movie movie tag list [id]` | List tags (per item or all) |
+| `movie movie stats` | Counts, storage, genre chart, avg ratings |
+
+```bash
+movie movie suggest 5
+movie movie tag add 1 favorite
+movie movie tag list
+movie movie stats
+```
+
+---
+
+### Configuration & System
+
+| Command | Description |
+|---|---|
+| `movie movie config` | Show all configuration |
+| `movie movie config set <key> <val>` | Set a config value |
+| `movie export [-o path]` | Dump media table as JSON |
+| `movie version` | Version, commit, build date, Go, OS/arch |
+| `movie self-update` | Update via `git pull --ff-only` |
+| `movie changelog [--latest]` | Show release notes |
+
+```bash
+movie movie config set movies_dir ~/Movies
+movie movie config set tmdb_api_key YOUR_KEY
+movie export -o ~/Desktop/library.json
+movie self-update
+```
+
+**Config keys:**
+
+| Key | Default | Purpose |
+|---|---|---|
+| `movies_dir` | `~/Movies` | Movie file destination |
+| `tv_dir` | `~/TVShows` | TV show destination |
+| `archive_dir` | `~/Archive` | Archive destination |
+| `scan_dir` | `~/Downloads` | Default scan source |
+| `tmdb_api_key` | *(none)* | TMDb API key |
+| `page_size` | `20` | Items per page in `ls` |
+
+---
+
+<div align="center">
+
+## Command Tree
+
+</div>
 
 ```
 movie
@@ -41,97 +271,27 @@ movie
 
 ---
 
-## Installation
+<div align="center">
 
-### Option 1 — Quick Install from GitHub Release
+## Build & Deploy
 
-Downloads the latest release binary, verifies SHA256 checksums, installs to your PATH. No Go or Git required.
+</div>
 
-**Windows (PowerShell)**
-```powershell
-irm https://github.com/mahin/movie-cli-v2/releases/latest/download/install.ps1 | iex
-```
+### Makefile Targets
 
-**Linux / macOS**
-```bash
-curl -fsSL https://github.com/mahin/movie-cli-v2/releases/latest/download/install.sh | bash
-```
+| Target | Description |
+|---|---|
+| `make build` | Compile for current platform |
+| `make build-windows` | Windows amd64 |
+| `make build-mac-arm` | macOS ARM64 |
+| `make build-mac-intel` | macOS amd64 |
+| `make build-linux` | Linux amd64 |
+| `make install` | Build + copy to `/usr/local/bin` |
 
-**Install options:**
-
-| Flag | PowerShell | Bash | Default |
-|------|-----------|------|---------|
-| Install directory | `-InstallDir C:\tools\movie` | `--dir ~/bin` | `%LOCALAPPDATA%\movie` (Win) / `~/.local/bin` (Unix) |
-| Force architecture | `-Arch arm64` | `--arch arm64` | Auto-detect |
-| Skip PATH update | `-NoPath` | `--no-path` | Adds to PATH |
-
-### Option 2 — Build from Source
-
-**Prerequisites:**
-
-| Requirement | Minimum | Check |
-|---|---|---|
-| **Go** | 1.22+ | `go version` |
-| **Git** | 2.x | `git --version` |
-| **PowerShell** | 5.1+ (Win) / 7+ (Unix) | `$PSVersionTable.PSVersion` |
-
-**Windows (PowerShell)**
-```powershell
-git clone https://github.com/mahin/movie-cli-v2.git; cd movie-cli-v2; .\run.ps1
-```
-
-**macOS / Linux**
-```bash
-git clone https://github.com/mahin/movie-cli-v2.git && cd movie-cli-v2 && pwsh run.ps1
-```
-
-**Using the bootstrap installer:**
-```powershell
-pwsh install.ps1                      # Fresh install (clone + build + deploy)
-pwsh install.ps1 -DeployPath ~/bin    # Custom deploy path
-```
-
-### Verify
-
-```bash
-movie version
-# v1.0.0 (commit: abc1234, built: 2026-04-09)
-#   Go:   go1.22.0
-#   OS:   linux/amd64
-```
-
-> **Tip**: If `movie` is not found, add the deploy path to your `PATH`.
-> Default: `E:\bin-run` (Windows) or `/usr/local/bin` (Unix) for source builds.
-
----
-
-## Quick Start
-
-```bash
-# Set your TMDb API key
-movie movie config set tmdb_api_key YOUR_KEY
-
-# Scan a folder
-movie movie scan ~/Downloads
-
-# Browse your library
-movie movie ls
-
-# Search TMDb directly
-movie movie search "Inception"
-
-# Get suggestions
-movie movie suggest 5
-```
-
----
-
-## Build & Deploy (run.ps1)
-
-The `run.ps1` script is the single-entry automation for pull → build → deploy → run.
+### Build via run.ps1
 
 ```powershell
-.\run.ps1                           # Full pipeline
+.\run.ps1                           # Full pipeline: pull, build, deploy
 .\run.ps1 -NoPull                   # Skip git pull
 .\run.ps1 -NoPull -NoDeploy        # Build only
 .\run.ps1 -R movie scan D:\movies  # Build + run scan
@@ -139,11 +299,23 @@ The `run.ps1` script is the single-entry automation for pull → build → deplo
 .\run.ps1 -ForcePull               # CI mode: discard changes + pull
 ```
 
+| Flag | Description |
+|---|---|
+| `-NoPull` | Skip `git pull` |
+| `-NoDeploy` | Skip deploy step |
+| `-R` | Run movie after build (trailing args forwarded) |
+| `-t` | Run all unit tests |
+| `-ForcePull` | CI mode: discard changes + pull |
+
 See [spec/03-general/04-run-guide.md](spec/03-general/04-run-guide.md) for the full usage guide.
 
 ---
 
+<div align="center">
+
 ## Release Workflow
+
+</div>
 
 Releases are fully automated via GitHub Actions. Pushing to a `release/**` branch or a `v*` tag triggers:
 
@@ -167,233 +339,23 @@ git push origin v1.3.0
 
 Both trigger the same pipeline. Version is resolved from the ref name.
 
+> **CI Pipeline:** Pushing a `release/*` branch or `v*` tag triggers GitHub Actions to cross-compile 6 targets, generate checksums, and create a GitHub release with changelog and install instructions.
+
 See [spec/pipeline/01-release-pipeline.md](spec/pipeline/01-release-pipeline.md) for the full pipeline spec.
 
 ---
 
-## Command Reference
-
-### `movie hello`
-
-Print a greeting with the current version.
-
-```bash
-movie hello
-# 👋 Hello from movie-cli-v2!
-#    Running version: v1.2.0
-```
-
-### `movie version`
-
-Show version, commit hash, build date, Go version, and OS/architecture.
-
-```bash
-movie version
-# movie v1.2.0 (commit: abc1234, built: 2024-06-01)
-#   Go:   go1.22.0
-#   OS:   darwin/arm64
-```
-
-### `movie self-update`
-
-Pull latest code via `git pull --ff-only`. Requires a clean working tree.
-
-```bash
-movie self-update
-# ✅ Updated abc1234 → def5678
-```
-
-### `movie movie config`
-
-View or update configuration settings. API keys are masked in output.
-
-```bash
-movie movie config                          # Show all settings
-movie movie config get movies_dir           # Get a single key
-movie movie config set movies_dir ~/Movies  # Set a key
-movie movie config set tmdb_api_key KEY     # Set API key
-movie movie config set page_size 30         # Items per page
-```
-
-| Key | Default | Purpose |
-|---|---|---|
-| `movies_dir` | `~/Movies` | Movie file destination |
-| `tv_dir` | `~/TVShows` | TV show destination |
-| `archive_dir` | `~/Archive` | Archive destination |
-| `scan_dir` | `~/Downloads` | Default scan source |
-| `tmdb_api_key` | *(none)* | TMDb API key |
-| `page_size` | `20` | Items per page in `ls` |
-
-### `movie movie scan [folder]`
-
-Scan a directory for video files, clean filenames, fetch TMDb metadata, and save to the database. Falls back to `scan_dir` config if no folder is given. Skips duplicates by file path.
-
-```bash
-movie movie scan ~/Downloads
-# 📁 Scanning: /home/user/Downloads
-# 🎬 Found: Inception (2010) — ★ 8.4
-# 📺 Found: Breaking Bad S01E01 — ★ 9.5
-# ✅ Done: 15 files, 12 movies, 3 TV shows
-```
-
-### `movie movie ls`
-
-Paginated, interactive list of file-backed media (items with a local file on disk). Records from `search` or `info` without files are excluded. Navigate with `N`/`P`/`Q` or enter a number for detail view.
-
-```bash
-movie movie ls
-#  1. 🎬 Inception (2010)               ★ 8.4
-#  2. 🎬 The Dark Knight (2008)         ★ 9.0
-#  3. 📺 Breaking Bad (2008)            ★ 9.5
-# Page 1/3 — [N]ext [P]rev [Q]uit or number:
-```
-
-### `movie movie search <name>`
-
-Search TMDb live, select a result, fetch full details + poster, and save to the database. Does **not** require a local file — catalogs metadata only.
-
-```bash
-movie movie search "Inception"
-#  1. 🎬 Inception (2010) ★ 8.4
-#  2. 🎬 Inception: The Cobol Job (2010) ★ 7.2
-# Select (0 to cancel): 1
-# ✅ Saved: Inception (2010)
-```
-
-### `movie movie info <id|title>`
-
-Show detailed metadata for a media item. Looks up by numeric ID or title string in the local DB first, then falls back to TMDb API search (auto-saves if found).
-
-```bash
-movie movie info 1
-movie movie info "Inception"
-# 🎬 Inception (2010)
-# ★ IMDb 8.8 / TMDb 8.4
-# 🎭 Action, Sci-Fi, Thriller
-# 🎬 Christopher Nolan
-# 👥 Leonardo DiCaprio, Joseph Gordon-Levitt, ...
-```
-
-### `movie movie suggest [N]`
-
-Get movie/TV recommendations based on your library's genre patterns or TMDb trending. Choose between Movie, TV, or Random categories interactively.
-
-```bash
-movie movie suggest 5
-# 🎯 Your top genres: Action, Sci-Fi, Thriller
-#  1. 🎬 Tenet (2020) ★ 7.3 — Action, Sci-Fi
-#  2. 🎬 Arrival (2016) ★ 7.9 — Drama, Sci-Fi
-#  ...
-```
-
-### `movie movie move [directory]`
-
-Browse a directory, select a video file, and move it to a configured destination with a clean filename (`Title (Year).ext`). Supports cross-drive moves with automatic copy+delete fallback.
-
-```bash
-movie movie move ~/Downloads
-#  1. 🎬 Inception (2010)  [2.4 GB]
-#  2. 📺 Breaking Bad S01  [1.1 GB]
-# Select file: 1
-# Move to: [1] Movies  [2] TV Shows  [3] Archive  [4] Custom
-# ✅ Moved → ~/Movies/Inception (2010).mkv
-```
-
-### `movie movie rename`
-
-Batch rename all library files to clean format (`Title (Year).ext`). Shows a preview and asks for confirmation before renaming.
-
-```bash
-movie movie rename
-# Renames to apply:
-#   inception.2010.bluray.mkv → Inception (2010).mkv
-#   the.dark.knight.mp4 → The Dark Knight (2008).mp4
-# Apply 2 renames? [y/N]: y
-# ✅ 2/2 files renamed
-```
-
-### `movie movie undo`
-
-Revert the most recent move or rename operation. Moves the file back to its original location.
-
-```bash
-movie movie undo
-# Last operation: ~/Downloads/inception.mkv → ~/Movies/Inception (2010).mkv
-# Undo this? [y/N]: y
-# ✅ Moved back to ~/Downloads/inception.mkv
-```
-
-### `movie movie play <id>`
-
-Open a media file with your system's default video player (macOS: `open`, Linux: `xdg-open`, Windows: `start`).
-
-```bash
-movie movie play 1
-# ▶️ Playing: Inception (2010)
-```
-
-### `movie movie stats`
-
-Display library statistics including counts, storage usage, genre distribution chart, and average ratings.
-
-```bash
-movie movie stats
-# 📊 Library Stats
-# 🎬 Movies: 42  📺 TV Shows: 8  📦 Total: 50
-# 💾 Storage: 185.3 GB total, avg 3.7 GB, largest 8.2 GB
-# 🎭 Top Genres:
-#   Action    ████████████████████████████ 28
-#   Sci-Fi    ████████████████████ 20
-#   Drama     ████████████████ 16
-# ★ Avg IMDb: 7.4 / Avg TMDb: 7.1
-```
-
-### `movie movie tag`
-
-Manage user-defined tags on media items.
-
-```bash
-movie movie tag add 1 favorite        # Add a tag
-movie movie tag remove 1 favorite     # Remove a tag
-movie movie tag list 1                # List tags for a media item
-movie movie tag list                  # List all tags with counts
-# favorite (3), watchlist (7), rewatch (2)
-```
-
-### `movie export`
-
-Export the entire media library as a JSON file. Default output: `./data/json/export/media.json`.
-
-```bash
-movie export                              # Export to default path
-movie export -o ~/Desktop/library.json    # Custom output path
-# ✅ Exported 50 items → ./data/json/export/media.json
-```
-
-
-Show the project changelog. Prints the full changelog by default, or only the latest version block with `--latest`.
-
-```bash
-movie changelog              # Full changelog
-movie changelog --latest     # Latest version only
-# ## v1.0.0
-# ### Added
-# - Batch move, JSON export, genre-based discovery, ...
-```
-
----
+<div align="center">
 
 ## Project Structure
+
+</div>
 
 ```
 movie-cli-v2/
 ├── main.go                        # Entry point
 ├── cmd/                           # Cobra commands (one file per command)
 │   ├── root.go                    # Root command, registers subcommands
-│   ├── hello.go                   # movie hello
-│   ├── version.go                 # movie version
-│   ├── update.go                  # movie self-update
-│   ├── movie.go                   # Parent: movie movie
 │   ├── movie_config.go            # config get/set
 │   ├── movie_scan.go              # scan folder
 │   ├── movie_ls.go                # paginated list
@@ -401,66 +363,68 @@ movie-cli-v2/
 │   ├── movie_info.go              # detail view + shared fetch helpers
 │   ├── movie_suggest.go           # recommendations
 │   ├── movie_move.go              # interactive move
-│   ├── movie_move_helpers.go      # move utility functions
 │   ├── movie_rename.go            # batch rename
 │   ├── movie_undo.go              # undo last move/rename
-│   ├── movie_play.go              # open with default player
 │   ├── movie_stats.go             # library statistics
 │   ├── movie_tag.go               # tag management
 │   └── movie_resolve.go           # shared ID/title resolver
 ├── cleaner/cleaner.go             # Filename cleaning + slug generation
 ├── tmdb/client.go                 # TMDb API client
-├── db/
-│   ├── db.go                      # SQLite connection + migrations
+├── db/                            # SQLite database layer
+│   ├── db.go                      # Connection + migrations
 │   ├── media.go                   # Media CRUD operations
 │   ├── config.go                  # Config get/set
-│   ├── history.go                 # Move history + scan history
-│   └── helpers.go                 # String utilities
+│   └── history.go                 # Move + scan history
 ├── updater/updater.go             # Git-based self-update
 ├── version/version.go             # Build-time version variables
 ├── .github/workflows/
-│   └── release.yml                # Release pipeline (cross-compile + GitHub Release)
+│   ├── ci.yml                     # Lint + test + vulncheck
+│   └── release.yml                # Cross-compile + GitHub Release
 ├── run.ps1                        # PowerShell build + deploy pipeline
-├── install.ps1                    # Bootstrap installer (clone + build)
+├── install.ps1                    # Bootstrap installer
 ├── CHANGELOG.md                   # Release notes
-├── spec.md                        # Full project specification
-└── spec/                          # Detailed specs
-    ├── pipeline/                  # CI/CD pipeline specs
-    ├── 01-coding-guidelines/      # Code style
-    ├── 02-error-manage-spec/      # Error handling
-    ├── 03-general/                # Build, install, config guides
-    └── 08-app/                    # Application specs
+└── spec/                          # Detailed specifications
 ```
 
-## Build
+---
 
-```bash
-make build              # Current OS
-make build-windows      # Windows amd64
-make build-mac-arm      # macOS ARM64
-make build-mac-intel    # macOS amd64
-make build-linux        # Linux amd64
-make install            # Build + copy to /usr/local/bin
-```
-
-## Dependencies
-
-| Package | Purpose |
-|---|---|
-| `github.com/spf13/cobra` | CLI framework |
-| `modernc.org/sqlite` | Pure-Go SQLite driver (no CGo) |
+<div align="center">
 
 ## Data Storage
+
+</div>
 
 All data lives in `./data/`:
 
 ```
 ./data/
-├── movie.db              # SQLite database (WAL mode)
+├── movie.db                  # SQLite database (WAL mode)
 ├── thumbnails/               # Downloaded poster images
-└── json/history/             # Move operation logs (RFC3339 timestamps)
+└── json/
+    ├── movie/                # Per-movie JSON metadata
+    ├── tv/                   # Per-show JSON metadata
+    └── history/              # Move operation logs (RFC3339)
 ```
 
+---
+
+<div align="center">
+
+## Dependencies
+
+</div>
+
+| Package | Purpose |
+|---|---|
+| [`github.com/spf13/cobra`](https://github.com/spf13/cobra) | CLI framework |
+| [`modernc.org/sqlite`](https://pkg.go.dev/modernc.org/sqlite) | Pure-Go SQLite driver (no CGo) |
+
+---
+
+<div align="center">
+
 ## License
+
+</div>
 
 Private project.
