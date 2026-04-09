@@ -85,6 +85,10 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: go.sum
 
+      - name: Download modules
+        if: needs.sha-check.outputs.already-built != 'true'
+        run: go mod download
+
       - name: Install govulncheck
         if: needs.sha-check.outputs.already-built != 'true'
         run: go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
@@ -127,6 +131,10 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: go.sum
+
+      - name: Download modules
+        if: needs.sha-check.outputs.already-built != 'true'
+        run: go mod download
 
       - name: Run tests
         if: needs.sha-check.outputs.already-built != 'true'
@@ -253,6 +261,10 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: go.sum
+
+      - name: Download modules
+        if: needs.sha-check.outputs.already-built != 'true'
+        run: go mod download
 
       - name: Build binary
         if: needs.sha-check.outputs.already-built != 'true'
