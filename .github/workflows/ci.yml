@@ -288,7 +288,7 @@ jobs:
         if: needs.sha-check.outputs.already-built != 'true'
         uses: actions/download-artifact@v4
         with:
-          pattern: mahin-*
+          pattern: movie-*
           path: binaries
 
       - name: Print build summary
