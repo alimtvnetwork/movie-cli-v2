@@ -74,7 +74,10 @@ func humanSize(bytes int64) string {
 }
 
 // promptSourceDirectory asks the user to pick a directory.
-func promptSourceDirectory(scanner interface{ Scan() bool; Text() string }, database *db.DB, home string) string {
+func promptSourceDirectory(scanner interface {
+	Scan() bool
+	Text() string
+}, database *db.DB, home string) string {
 	scanDir, _ := database.GetConfig("scan_dir")
 	scanDir = expandHome(scanDir, home)
 
