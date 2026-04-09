@@ -7,7 +7,6 @@
 **Personal movie & TV show library manager — from the terminal**
 
 [![CI](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml)
-[![golangci-lint](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/mahin/movie-cli-v2/actions/workflows/ci.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/mahin/movie-cli-v2?style=flat-square&label=version)](https://github.com/mahin/movie-cli-v2/releases)
 [![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](https://github.com/mahin/movie-cli-v2)
