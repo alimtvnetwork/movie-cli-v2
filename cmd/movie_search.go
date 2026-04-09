@@ -31,14 +31,14 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
 	// Get TMDb API key
-	apiKey, err := database.GetConfig("tmdb_api_key")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", err)
+	apiKey, cfgErr := database.GetConfig("tmdb_api_key")
+	if cfgErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", cfgErr)
 	}
 	if apiKey == "" {
 		apiKey = os.Getenv("TMDB_API_KEY")
@@ -46,7 +46,7 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ No TMDb API key configured.")
 		fmt.Fprintln(os.Stderr, "   Set it with: movie movie config set tmdb_api_key YOUR_KEY")
-		os.Exit(1)
+		return
 	}
 
 	client := tmdb.NewClient(apiKey)
@@ -54,10 +54,10 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 	fmt.Printf("🔎 Searching TMDb for: %s\n\n", query)
 
 	// Search TMDb API
-	results, err := client.SearchMulti(query)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "❌ TMDb search error: %v\n", err)
-		os.Exit(1)
+	results, searchErr := client.SearchMulti(query)
+	if searchErr != nil {
+		fmt.Fprintf(os.Stderr, "❌ TMDb search error: %v\n", searchErr)
+		return
 	}
 
 	if len(results) == 0 {
@@ -67,22 +67,22 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 
 	// Show results and let user pick
 	fmt.Printf("Found %d results:\n\n", len(results))
-	for i, r := range results {
+	for i := range results {
 		if i >= 15 {
 			break
 		}
-		title := r.GetDisplayTitle()
-		year := r.GetYear()
+		title := results[i].GetDisplayTitle()
+		year := results[i].GetYear()
 		typeIcon := "🎬"
 		typeLabel := "Movie"
-		if r.MediaType == "tv" {
+		if results[i].MediaType == "tv" {
 			typeIcon = "📺"
 			typeLabel = "TV Show"
 		}
 
 		rating := "N/A"
-		if r.VoteAvg > 0 {
-			rating = fmt.Sprintf("%.1f", r.VoteAvg)
+		if results[i].VoteAvg > 0 {
+			rating = fmt.Sprintf("%.1f", results[i].VoteAvg)
 		}
 
 		yearStr := ""
@@ -98,9 +98,9 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 	fmt.Print("Enter number to save (0 to cancel): ")
 
 	var choice int
-	_, err = fmt.Scan(&choice)
-	if err != nil || choice < 1 || choice > len(results) || choice > 15 {
-		fmt.Println("❌ Cancelled.")
+	_, scanErr := fmt.Scan(&choice)
+	if scanErr != nil || choice < 1 || choice > len(results) || choice > 15 {
+		fmt.Println("❌ Canceled.")
 		return
 	}
 
@@ -116,14 +116,14 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 
 	// Build media record
 	m := &db.Media{
-		Title:      title,
-		CleanTitle: title,
-		Year:       yearInt,
-		TmdbID:     selected.ID,
-		TmdbRating: selected.VoteAvg,
-		Popularity: selected.Popularity,
+		Title:       title,
+		CleanTitle:  title,
+		Year:        yearInt,
+		TmdbID:      selected.ID,
+		TmdbRating:  selected.VoteAvg,
+		Popularity:  selected.Popularity,
 		Description: selected.Overview,
-		Genre:      tmdb.GenreNames(selected.GenreIDs),
+		Genre:       tmdb.GenreNames(selected.GenreIDs),
 	}
 
 	if selected.MediaType == "movie" || selected.MediaType == "" {
@@ -141,11 +141,11 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 			slug += "-" + strconv.Itoa(m.Year)
 		}
 		thumbDir := filepath.Join(database.BasePath, "thumbnails", slug)
-		if err := os.MkdirAll(thumbDir, 0755); err != nil {
-			fmt.Fprintf(os.Stderr, "⚠️  Cannot create thumbnail dir: %v\n", err)
+		if mkdirErr := os.MkdirAll(thumbDir, 0755); mkdirErr != nil {
+			fmt.Fprintf(os.Stderr, "⚠️  Cannot create thumbnail dir: %v\n", mkdirErr)
 		}
 		thumbPath := filepath.Join(thumbDir, slug+".jpg")
-		if err := client.DownloadPoster(selected.PosterPath, thumbPath); err == nil {
+		if dlErr := client.DownloadPoster(selected.PosterPath, thumbPath); dlErr == nil {
 			m.ThumbnailPath = thumbPath
 			fmt.Println("🖼️  Thumbnail saved")
 		}
@@ -153,23 +153,23 @@ func runMovieSearch(cmd *cobra.Command, args []string) {
 
 	// Save JSON to movie or tv folder based on type
 	jsonDir := filepath.Join(database.BasePath, "json", m.Type)
-	if err := os.MkdirAll(jsonDir, 0755); err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Cannot create JSON dir: %v\n", err)
+	if mkdirErr := os.MkdirAll(jsonDir, 0755); mkdirErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Cannot create JSON dir: %v\n", mkdirErr)
 	}
 
 	// Insert into database (or update if already exists by tmdb_id)
-	_, err = database.InsertMedia(m)
-	if err != nil {
+	_, insertErr := database.InsertMedia(m)
+	if insertErr != nil {
 		if m.TmdbID > 0 {
-			err = database.UpdateMediaByTmdbID(m)
-			if err == nil {
+			updateErr := database.UpdateMediaByTmdbID(m)
+			if updateErr == nil {
 				fmt.Printf("🔄 Updated existing record for: %s\n", m.Title)
 			} else {
-				fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", err)
+				fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", updateErr)
 				return
 			}
 		} else {
-			fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", insertErr)
 			return
 		}
 	}

@@ -132,8 +132,8 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 		fmt.Fprintf(os.Stderr, "⚠️  DB error: %v\n", existErr)
 	}
 	existingIDs := make(map[int]bool)
-	for _, e := range existing {
-		existingIDs[e.TmdbID] = true
+	for i := range existing {
+		existingIDs[existing[i].TmdbID] = true
 	}
 
 	var suggestions []tmdb.SearchResult
@@ -154,10 +154,10 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 			fmt.Fprintf(os.Stderr, "     ⚠️  Discover error: %v\n", discErr)
 			continue
 		}
-		for _, d := range discovered {
-			if !existingIDs[d.ID] && len(suggestions) < count {
-				suggestions = append(suggestions, d)
-				existingIDs[d.ID] = true
+		for i := range discovered {
+			if !existingIDs[discovered[i].ID] && len(suggestions) < count {
+				suggestions = append(suggestions, discovered[i])
+				existingIDs[discovered[i].ID] = true
 			}
 		}
 	}
@@ -173,10 +173,10 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 			if recErr != nil {
 				continue
 			}
-			for _, r := range recs {
-				if !existingIDs[r.ID] && len(suggestions) < count {
-					suggestions = append(suggestions, r)
-					existingIDs[r.ID] = true
+			for i := range recs {
+				if !existingIDs[recs[i].ID] && len(suggestions) < count {
+					suggestions = append(suggestions, recs[i])
+					existingIDs[recs[i].ID] = true
 				}
 			}
 		}
@@ -188,10 +188,10 @@ func suggestByType(database *db.DB, client *tmdb.Client, mediaType string, count
 		if trendErr != nil {
 			fmt.Fprintf(os.Stderr, "⚠️  Trending fetch error: %v\n", trendErr)
 		}
-		for _, t := range trending {
-			if !existingIDs[t.ID] && len(suggestions) < count {
-				suggestions = append(suggestions, t)
-				existingIDs[t.ID] = true
+		for i := range trending {
+			if !existingIDs[trending[i].ID] && len(suggestions) < count {
+				suggestions = append(suggestions, trending[i])
+				existingIDs[trending[i].ID] = true
 			}
 		}
 	}
@@ -216,16 +216,18 @@ func suggestRandom(client *tmdb.Client, count int) {
 		fmt.Fprintf(os.Stderr, "⚠️  TV trending error: %v\n", err)
 	}
 
-	all := append(movieTrending, tvTrending...)
+	all := make([]tmdb.SearchResult, 0, len(movieTrending)+len(tvTrending))
+	all = append(all, movieTrending...)
+	all = append(all, tvTrending...)
 	rand.Shuffle(len(all), func(i, j int) { all[i], all[j] = all[j], all[i] })
 
-	for _, item := range all {
+	for i := range all {
 		if len(suggestions) >= count {
 			break
 		}
-		if !seenIDs[item.ID] {
-			suggestions = append(suggestions, item)
-			seenIDs[item.ID] = true
+		if !seenIDs[all[i].ID] {
+			suggestions = append(suggestions, all[i])
+			seenIDs[all[i].ID] = true
 		}
 	}
 
@@ -257,11 +259,11 @@ func printSuggestions(suggestions []tmdb.SearchResult, category string) {
 
 	fmt.Printf("✨ Suggested %s (%d):\n\n", category, len(suggestions))
 
-	for i, s := range suggestions {
-		title := s.GetDisplayTitle()
-		year := s.GetYear()
-		rating := fmt.Sprintf("%.1f", s.VoteAvg)
-		genres := tmdb.GenreNames(s.GenreIDs)
+	for i := range suggestions {
+		title := suggestions[i].GetDisplayTitle()
+		year := suggestions[i].GetYear()
+		rating := fmt.Sprintf("%.1f", suggestions[i].VoteAvg)
+		genres := tmdb.GenreNames(suggestions[i].GenreIDs)
 
 		fmt.Printf("  %2d. %s", i+1, title)
 		if year != "" {

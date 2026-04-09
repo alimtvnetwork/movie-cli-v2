@@ -17,7 +17,7 @@ var tagCmd = &cobra.Command{
 	Short: "Manage tags on media items",
 	Long:  "Add, remove, or list user-defined tags on movies and TV shows.",
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 

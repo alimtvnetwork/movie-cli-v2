@@ -58,16 +58,16 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 	}
 
 	// Check folder exists
-	info, err := os.Stat(scanDir)
-	if err != nil || !info.IsDir() {
+	info, statErr := os.Stat(scanDir)
+	if statErr != nil || !info.IsDir() {
 		fmt.Fprintf(os.Stderr, "❌ Folder not found: %s\n", scanDir)
 		os.Exit(1)
 	}
 
 	// Get TMDb API key
-	apiKey, err := database.GetConfig("tmdb_api_key")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", err)
+	apiKey, cfgErr := database.GetConfig("tmdb_api_key")
+	if cfgErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", cfgErr)
 	}
 	if apiKey == "" {
 		apiKey = os.Getenv("TMDB_API_KEY")
@@ -86,9 +86,9 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 
 	var totalFiles, movieCount, tvCount, skipped int
 
-	entries, err := os.ReadDir(scanDir)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "❌ Cannot read folder: %v\n", err)
+	entries, readErr := os.ReadDir(scanDir)
+	if readErr != nil {
+		fmt.Fprintf(os.Stderr, "❌ Cannot read folder: %v\n", readErr)
 		os.Exit(1)
 	}
 
@@ -99,8 +99,8 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 		// Handle both files and directories
 		if entry.IsDir() {
 			// For directories, look for video files inside
-			subEntries, err := os.ReadDir(fullPath)
-			if err != nil {
+			subEntries, subErr := os.ReadDir(fullPath)
+			if subErr != nil {
 				continue
 			}
 			foundVideo := false
@@ -136,8 +136,8 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(os.Stderr, "     ⚠️  DB search error: %v\n", searchErr)
 		}
 		alreadyExists := false
-		for _, e := range existing {
-			if e.OriginalFilePath == fullPath {
+		for i := range existing {
+			if existing[i].OriginalFilePath == fullPath {
 				alreadyExists = true
 				fmt.Println("     ⏩ Already in database, skipping")
 				break
@@ -154,9 +154,9 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 		}
 
 		// Build media record
-		fi, statErr := os.Stat(fullPath)
-		if statErr != nil {
-			fmt.Fprintf(os.Stderr, "  ⚠️  Cannot stat file: %v\n", statErr)
+		fi, fiErr := os.Stat(fullPath)
+		if fiErr != nil {
+			fmt.Fprintf(os.Stderr, "  ⚠️  Cannot stat file: %v\n", fiErr)
 			continue
 		}
 		m := &db.Media{
@@ -180,9 +180,9 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 				searchQuery += " " + strconv.Itoa(result.Year)
 			}
 
-			results, err := client.SearchMulti(searchQuery)
-			if err == nil && len(results) > 0 {
-				best := results[0]
+			tmdbResults, tmdbErr := client.SearchMulti(searchQuery)
+			if tmdbErr == nil && len(tmdbResults) > 0 {
+				best := tmdbResults[0]
 				m.TmdbID = best.ID
 				m.TmdbRating = best.VoteAvg
 				m.Popularity = best.Popularity
@@ -204,11 +204,11 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 						slug += "-" + strconv.Itoa(m.Year)
 					}
 					thumbDir := filepath.Join(database.BasePath, "thumbnails", slug)
-				if err := os.MkdirAll(thumbDir, 0755); err != nil {
-					fmt.Fprintf(os.Stderr, "     ⚠️  Cannot create thumbnail dir: %v\n", err)
-				}
+					if mkdirErr := os.MkdirAll(thumbDir, 0755); mkdirErr != nil {
+						fmt.Fprintf(os.Stderr, "     ⚠️  Cannot create thumbnail dir: %v\n", mkdirErr)
+					}
 					thumbPath := filepath.Join(thumbDir, slug+".jpg")
-					if err := client.DownloadPoster(best.PosterPath, thumbPath); err == nil {
+					if dlErr := client.DownloadPoster(best.PosterPath, thumbPath); dlErr == nil {
 						m.ThumbnailPath = thumbPath
 						fmt.Println("     🖼️  Thumbnail saved")
 					}
@@ -221,21 +221,21 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 		}
 
 		// Insert into database
-		_, err = database.InsertMedia(m)
-		if err != nil {
+		_, insertErr := database.InsertMedia(m)
+		if insertErr != nil {
 			// Try update if duplicate tmdb_id
 			if m.TmdbID > 0 {
 				if updateErr := database.UpdateMediaByTmdbID(m); updateErr != nil {
 					fmt.Fprintf(os.Stderr, "     ⚠️  DB update error: %v\n", updateErr)
 				}
 			} else {
-				fmt.Fprintf(os.Stderr, "     ❌ DB error: %v\n", err)
+				fmt.Fprintf(os.Stderr, "     ❌ DB error: %v\n", insertErr)
 			}
 		}
 
 		// Write JSON metadata file
-		if err := writeMediaJSON(database.BasePath, m); err != nil {
-			fmt.Fprintf(os.Stderr, "     ⚠️  JSON write error: %v\n", err)
+		if jsonErr := writeMediaJSON(database.BasePath, m); jsonErr != nil {
+			fmt.Fprintf(os.Stderr, "     ⚠️  JSON write error: %v\n", jsonErr)
 		}
 
 		if m.Type == "movie" {
@@ -247,8 +247,8 @@ func runMovieScan(cmd *cobra.Command, args []string) {
 	}
 
 	// Log scan history
-	if err := database.InsertScanHistory(scanDir, totalFiles, movieCount, tvCount); err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Could not log scan history: %v\n", err)
+	if histErr := database.InsertScanHistory(scanDir, totalFiles, movieCount, tvCount); histErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Could not log scan history: %v\n", histErr)
 	}
 
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

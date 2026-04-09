@@ -7,13 +7,14 @@ import (
 	"strings"
 )
 
+// Result holds the outcome of a self-update attempt.
 type Result struct {
-	AlreadyLatest   bool
 	PreviousVersion string
 	UpdatedTo       string
 	AfterCommit     string
 	RepoPath        string
 	Output          string
+	AlreadyLatest   bool
 }
 
 func Run() (*Result, error) {

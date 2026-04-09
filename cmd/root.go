@@ -46,7 +46,7 @@ Documentation: https://github.com/mahin/mahin-cli-v2`, version.Short()),
 	Version: version.Short(),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("movie-cli %s\n\n", version.Short())
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 

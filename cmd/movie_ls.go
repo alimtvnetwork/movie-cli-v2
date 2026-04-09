@@ -25,23 +25,23 @@ func runMovieLs(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
-	pageSizeStr, err := database.GetConfig("page_size")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", err)
+	pageSizeStr, cfgErr := database.GetConfig("page_size")
+	if cfgErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", cfgErr)
 	}
 	pageSize, _ := strconv.Atoi(pageSizeStr)
 	if pageSize <= 0 {
 		pageSize = 20
 	}
 
-	total, err := database.CountMedia("")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+	total, countErr := database.CountMedia("")
+	if countErr != nil {
+		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", countErr)
+		return
 	}
 	if total == 0 {
 		fmt.Println("📭 No media found. Run 'movie movie scan <folder>' first.")
@@ -52,9 +52,9 @@ func runMovieLs(cmd *cobra.Command, args []string) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		media, err := database.ListMedia(offset, pageSize)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ Error: %v\n", err)
+		media, listErr := database.ListMedia(offset, pageSize)
+		if listErr != nil {
+			fmt.Fprintf(os.Stderr, "❌ Error: %v\n", listErr)
 			return
 		}
 
@@ -67,27 +67,27 @@ func runMovieLs(cmd *cobra.Command, args []string) {
 		fmt.Printf("🎬 Your Library — Page %d/%d (%d total)\n", page, totalPages, total)
 		fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
-		for i, m := range media {
+		for i := range media {
 			num := offset + i + 1
 			yearStr := ""
-			if m.Year > 0 {
-				yearStr = fmt.Sprintf("(%d)", m.Year)
+			if media[i].Year > 0 {
+				yearStr = fmt.Sprintf("(%d)", media[i].Year)
 			}
 
 			rating := "N/A"
-			if m.TmdbRating > 0 {
-				rating = fmt.Sprintf("%.1f", m.TmdbRating)
-			} else if m.ImdbRating > 0 {
-				rating = fmt.Sprintf("%.1f", m.ImdbRating)
+			if media[i].TmdbRating > 0 {
+				rating = fmt.Sprintf("%.1f", media[i].TmdbRating)
+			} else if media[i].ImdbRating > 0 {
+				rating = fmt.Sprintf("%.1f", media[i].ImdbRating)
 			}
 
 			typeIcon := "🎬"
-			if m.Type == "tv" {
+			if media[i].Type == "tv" {
 				typeIcon = "📺"
 			}
 
 			fmt.Printf("  %3d. %-40s %-6s  ⭐ %-4s  %s %s\n",
-				num, m.CleanTitle, yearStr, rating, typeIcon, capitalize(m.Type))
+				num, media[i].CleanTitle, yearStr, rating, typeIcon, capitalize(media[i].Type))
 		}
 
 		fmt.Println()
@@ -117,7 +117,7 @@ func runMovieLs(cmd *cobra.Command, args []string) {
 			return
 		default:
 			// Try to parse as number for detail view
-			if num, err := strconv.Atoi(input); err == nil && num > 0 && num <= total {
+			if num, parseErr := strconv.Atoi(input); parseErr == nil && num > 0 && num <= total {
 				showMediaDetail(database, int64(num))
 				fmt.Print("\nPress Enter to continue...")
 				scanner.Scan()

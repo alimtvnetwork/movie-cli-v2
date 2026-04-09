@@ -17,8 +17,8 @@ const imageBaseURL = "https://image.tmdb.org/t/p/w500"
 
 // Client interacts with the TMDb API.
 type Client struct {
-	APIKey     string
 	HTTPClient *http.Client
+	APIKey     string
 }
 
 // NewClient creates a new TMDb client. Reads API key from env or config.
@@ -36,16 +36,16 @@ func NewClient(apiKey string) *Client {
 
 // SearchResult holds a search result from TMDb.
 type SearchResult struct {
-	ID          int     `json:"id"`
-	Title       string  `json:"title"`        // for movies
-	Name        string  `json:"name"`         // for TV
 	Overview    string  `json:"overview"`
-	ReleaseDate string  `json:"release_date"` // movies
+	Title       string  `json:"title"`         // for movies
+	Name        string  `json:"name"`          // for TV
+	ReleaseDate string  `json:"release_date"`  // movies
 	FirstAir    string  `json:"first_air_date"` // TV
-	VoteAvg     float64 `json:"vote_average"`
-	Popularity  float64 `json:"popularity"`
 	PosterPath  string  `json:"poster_path"`
 	MediaType   string  `json:"media_type"`
+	VoteAvg     float64 `json:"vote_average"`
+	Popularity  float64 `json:"popularity"`
+	ID          int     `json:"id"`
 	GenreIDs    []int   `json:"genre_ids"`
 }
 
@@ -55,35 +55,35 @@ type searchResponse struct {
 
 // MovieDetails holds detailed movie info.
 type MovieDetails struct {
-	ID          int      `json:"id"`
-	Title       string   `json:"title"`
-	Overview    string   `json:"overview"`
-	ReleaseDate string   `json:"release_date"`
-	VoteAvg     float64  `json:"vote_average"`
-	Popularity  float64  `json:"popularity"`
-	PosterPath  string   `json:"poster_path"`
-	ImdbID      string   `json:"imdb_id"`
-	Genres      []Genre  `json:"genres"`
-	Runtime     int      `json:"runtime"`
+	Title       string  `json:"title"`
+	Overview    string  `json:"overview"`
+	ReleaseDate string  `json:"release_date"`
+	PosterPath  string  `json:"poster_path"`
+	ImdbID      string  `json:"imdb_id"`
+	VoteAvg     float64 `json:"vote_average"`
+	Popularity  float64 `json:"popularity"`
+	ID          int     `json:"id"`
+	Runtime     int     `json:"runtime"`
+	Genres      []Genre `json:"genres"`
 }
 
 // TVDetails holds detailed TV show info.
 type TVDetails struct {
-	ID           int      `json:"id"`
-	Name         string   `json:"name"`
-	Overview     string   `json:"overview"`
-	FirstAirDate string   `json:"first_air_date"`
-	VoteAvg      float64  `json:"vote_average"`
-	Popularity   float64  `json:"popularity"`
-	PosterPath   string   `json:"poster_path"`
-	Genres       []Genre  `json:"genres"`
-	Seasons      int      `json:"number_of_seasons"`
+	Name         string  `json:"name"`
+	Overview     string  `json:"overview"`
+	FirstAirDate string  `json:"first_air_date"`
+	PosterPath   string  `json:"poster_path"`
+	VoteAvg      float64 `json:"vote_average"`
+	Popularity   float64 `json:"popularity"`
+	ID           int     `json:"id"`
+	Seasons      int     `json:"number_of_seasons"`
+	Genres       []Genre `json:"genres"`
 }
 
 // Genre is a TMDb genre.
 type Genre struct {
-	ID   int    `json:"id"`
 	Name string `json:"name"`
+	ID   int    `json:"id"`
 }
 
 // Credits holds cast and crew.
@@ -117,9 +117,9 @@ func (c *Client) SearchMulti(query string) ([]SearchResult, error) {
 
 	// Filter to only movie/tv
 	var filtered []SearchResult
-	for _, r := range resp.Results {
-		if r.MediaType == "movie" || r.MediaType == "tv" {
-			filtered = append(filtered, r)
+	for i := range resp.Results {
+		if resp.Results[i].MediaType == "movie" || resp.Results[i].MediaType == "tv" {
+			filtered = append(filtered, resp.Results[i])
 		}
 	}
 	return filtered, nil
