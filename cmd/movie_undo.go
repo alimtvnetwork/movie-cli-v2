@@ -23,12 +23,12 @@ func runMovieUndo(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
-	lastMove, err := database.GetLastMove()
-	if err != nil {
+	lastMove, moveErr := database.GetLastMove()
+	if moveErr != nil {
 		fmt.Println("📭 No move operations to undo.")
 		return
 	}
@@ -47,31 +47,31 @@ func runMovieUndo(cmd *cobra.Command, args []string) {
 	}
 	confirm := strings.ToLower(strings.TrimSpace(scanner.Text()))
 	if confirm != "y" && confirm != "yes" {
-		fmt.Println("❌ Undo cancelled.")
+		fmt.Println("❌ Undo canceled.")
 		return
 	}
 
 	// Check source exists
-	if _, err := os.Stat(lastMove.ToPath); os.IsNotExist(err) {
+	if _, statErr := os.Stat(lastMove.ToPath); os.IsNotExist(statErr) {
 		fmt.Fprintf(os.Stderr, "❌ File not found at: %s\n", lastMove.ToPath)
 		fmt.Fprintln(os.Stderr, "   It may have been moved or deleted manually.")
-		os.Exit(1)
+		return
 	}
 
 	// Move back
-	if err := MoveFile(lastMove.ToPath, lastMove.FromPath); err != nil {
-		fmt.Fprintf(os.Stderr, "❌ Undo failed: %v\n", err)
-		os.Exit(1)
+	if undoErr := MoveFile(lastMove.ToPath, lastMove.FromPath); undoErr != nil {
+		fmt.Fprintf(os.Stderr, "❌ Undo failed: %v\n", undoErr)
+		return
 	}
 
 	// Mark as undone in DB
-	if err := database.MarkMoveUndone(lastMove.ID); err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Could not mark move as undone: %v\n", err)
+	if markErr := database.MarkMoveUndone(lastMove.ID); markErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Could not mark move as undone: %v\n", markErr)
 	}
 
 	// Update media path back
-	if err := database.UpdateMediaPath(lastMove.MediaID, lastMove.FromPath); err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Could not update media path: %v\n", err)
+	if pathErr := database.UpdateMediaPath(lastMove.MediaID, lastMove.FromPath); pathErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Could not update media path: %v\n", pathErr)
 	}
 
 	fmt.Println()

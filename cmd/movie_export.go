@@ -32,19 +32,13 @@ func init() {
 	movieExportCmd.Flags().StringVarP(&exportOutput, "output", "o", "", "Output file path (default: ./data/json/export/media.json)")
 }
 
-// mediaJSON mirrors db.Media with JSON tags for clean output.
-type mediaJSON struct {
-	ID               int64   `json:"id"`
+// exportMediaJSON mirrors db.Media with JSON tags for clean output.
+type exportMediaJSON struct {
 	Title            string  `json:"title"`
 	CleanTitle       string  `json:"clean_title"`
-	Year             int     `json:"year"`
 	Type             string  `json:"type"`
-	TmdbID           int     `json:"tmdb_id"`
 	ImdbID           string  `json:"imdb_id,omitempty"`
 	Description      string  `json:"description,omitempty"`
-	ImdbRating       float64 `json:"imdb_rating,omitempty"`
-	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
-	Popularity       float64 `json:"popularity,omitempty"`
 	Genre            string  `json:"genre,omitempty"`
 	Director         string  `json:"director,omitempty"`
 	CastList         string  `json:"cast_list,omitempty"`
@@ -53,11 +47,17 @@ type mediaJSON struct {
 	OriginalFilePath string  `json:"original_file_path,omitempty"`
 	CurrentFilePath  string  `json:"current_file_path,omitempty"`
 	FileExtension    string  `json:"file_extension,omitempty"`
+	ID               int64   `json:"id"`
 	FileSize         int64   `json:"file_size,omitempty"`
+	ImdbRating       float64 `json:"imdb_rating,omitempty"`
+	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
+	Popularity       float64 `json:"popularity,omitempty"`
+	Year             int     `json:"year"`
+	TmdbID           int     `json:"tmdb_id"`
 }
 
-func toMediaJSON(m db.Media) mediaJSON {
-	return mediaJSON{
+func toExportMediaJSON(m db.Media) exportMediaJSON {
+	return exportMediaJSON{
 		ID: m.ID, Title: m.Title, CleanTitle: m.CleanTitle,
 		Year: m.Year, Type: m.Type, TmdbID: m.TmdbID, ImdbID: m.ImdbID,
 		Description: m.Description, ImdbRating: m.ImdbRating, TmdbRating: m.TmdbRating,
@@ -73,7 +73,7 @@ func runExport(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
@@ -81,7 +81,7 @@ func runExport(cmd *cobra.Command, args []string) {
 	items, err := database.ListMedia(0, 100000)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Failed to read media: %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	if len(items) == 0 {
@@ -90,15 +90,15 @@ func runExport(cmd *cobra.Command, args []string) {
 	}
 
 	// Convert to JSON-friendly structs
-	out := make([]mediaJSON, len(items))
-	for i, m := range items {
-		out[i] = toMediaJSON(m)
+	out := make([]exportMediaJSON, len(items))
+	for i := range items {
+		out[i] = toExportMediaJSON(items[i])
 	}
 
 	data, err := json.MarshalIndent(out, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ JSON encoding error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	// Determine output path
@@ -110,12 +110,12 @@ func runExport(cmd *cobra.Command, args []string) {
 	// Ensure directory exists
 	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Cannot create directory: %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	if err := os.WriteFile(outPath, data, 0644); err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Failed to write file: %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	fmt.Printf("✅ Exported %d items → %s\n", len(items), outPath)

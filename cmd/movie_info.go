@@ -4,17 +4,16 @@
 // Checks local DB first; if not found by title, falls back to TMDb API,
 // fetches full details, stores in DB, then displays.
 //
-// ── Shared helpers exported from this file ──────────────────────────
+// -- Shared helpers exported from this file --
 //
-//   fetchMovieDetails(client, tmdbID, m)  — populate Media with TMDb movie details + credits
-//   fetchTVDetails(client, tmdbID, m)     — populate Media with TMDb TV details + credits
+//	fetchMovieDetails(client, tmdbID, m)  — populate Media with TMDb movie details + credits
+//	fetchTVDetails(client, tmdbID, m)     — populate Media with TMDb TV details + credits
 //
 // Consumers: movie_scan.go (scan + metadata fetch), movie_info.go (info fallback)
 //
-// These helpers centralise all TMDb detail+credit fetching so that scan
+// These helpers centralize all TMDb detail+credit fetching so that scan
 // and info share identical enrichment logic.  Any change to field mapping
 // or credit extraction should happen here only.
-// ────────────────────────────────────────────────────────────────────
 package cmd
 
 import (
@@ -47,15 +46,15 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
 	query := strings.Join(args, " ")
 
 	// 1) Try local DB first (by ID or title)
-	m, err := resolveMediaByQuery(database, query)
-	if err == nil {
+	m, resolveErr := resolveMediaByQuery(database, query)
+	if resolveErr == nil {
 		fmt.Println("📚 Found in local library:")
 		fmt.Println()
 		printMediaDetail(m)
@@ -65,9 +64,9 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	// 3) Not in DB — fall back to TMDb API
 	fmt.Printf("🔎 Not found locally. Searching TMDb for: %s\n\n", query)
 
-	apiKey, err := database.GetConfig("tmdb_api_key")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", err)
+	apiKey, cfgErr := database.GetConfig("tmdb_api_key")
+	if cfgErr != nil {
+		fmt.Fprintf(os.Stderr, "⚠️  Config read error: %v\n", cfgErr)
 	}
 	if apiKey == "" {
 		apiKey = os.Getenv("TMDB_API_KEY")
@@ -75,14 +74,14 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ No TMDb API key configured.")
 		fmt.Fprintln(os.Stderr, "   Set it with: movie movie config set tmdb_api_key YOUR_KEY")
-		os.Exit(1)
+		return
 	}
 
 	client := tmdb.NewClient(apiKey)
-	tmdbResults, err := client.SearchMulti(query)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "❌ TMDb search error: %v\n", err)
-		os.Exit(1)
+	tmdbResults, searchErr := client.SearchMulti(query)
+	if searchErr != nil {
+		fmt.Fprintf(os.Stderr, "❌ TMDb search error: %v\n", searchErr)
+		return
 	}
 	if len(tmdbResults) == 0 {
 		fmt.Println("📭 No results found on TMDb either.")
@@ -139,23 +138,23 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 			slug += "-" + strconv.Itoa(m.Year)
 		}
 		thumbDir := filepath.Join(database.BasePath, "thumbnails", slug)
-		if err := os.MkdirAll(thumbDir, 0755); err != nil {
-			fmt.Fprintf(os.Stderr, "⚠️  Cannot create thumbnail dir: %v\n", err)
+		if mkdirErr := os.MkdirAll(thumbDir, 0755); mkdirErr != nil {
+			fmt.Fprintf(os.Stderr, "⚠️  Cannot create thumbnail dir: %v\n", mkdirErr)
 		}
 		thumbPath := filepath.Join(thumbDir, slug+".jpg")
-		if err := client.DownloadPoster(selected.PosterPath, thumbPath); err == nil {
+		if dlErr := client.DownloadPoster(selected.PosterPath, thumbPath); dlErr == nil {
 			m.ThumbnailPath = thumbPath
 		}
 	}
 
 	// Save to DB
-	_, err = database.InsertMedia(m)
-	if err != nil {
+	_, insertErr := database.InsertMedia(m)
+	if insertErr != nil {
 		if m.TmdbID > 0 {
-			err = database.UpdateMediaByTmdbID(m)
+			insertErr = database.UpdateMediaByTmdbID(m)
 		}
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", err)
+		if insertErr != nil {
+			fmt.Fprintf(os.Stderr, "❌ DB error: %v\n", insertErr)
 			return
 		}
 	}
@@ -166,11 +165,10 @@ func runMovieInfo(cmd *cobra.Command, args []string) {
 	printMediaDetail(m)
 }
 
-
 // fetchMovieDetails populates a Media record with TMDb movie details + credits.
 func fetchMovieDetails(client *tmdb.Client, tmdbID int, m *db.Media) {
-	details, err := client.GetMovieDetails(tmdbID)
-	if err == nil {
+	details, detailErr := client.GetMovieDetails(tmdbID)
+	if detailErr == nil {
 		m.ImdbID = details.ImdbID
 		m.Title = details.Title
 		genres := make([]string, len(details.Genres))
@@ -180,8 +178,8 @@ func fetchMovieDetails(client *tmdb.Client, tmdbID int, m *db.Media) {
 		m.Genre = strings.Join(genres, ", ")
 	}
 
-	credits, err := client.GetMovieCredits(tmdbID)
-	if err == nil {
+	credits, creditErr := client.GetMovieCredits(tmdbID)
+	if creditErr == nil {
 		var directors, castNames []string
 		for _, c := range credits.Crew {
 			if c.Job == "Director" {
@@ -202,8 +200,8 @@ func fetchMovieDetails(client *tmdb.Client, tmdbID int, m *db.Media) {
 
 // fetchTVDetails populates a Media record with TMDb TV details + credits.
 func fetchTVDetails(client *tmdb.Client, tmdbID int, m *db.Media) {
-	details, err := client.GetTVDetails(tmdbID)
-	if err == nil {
+	details, detailErr := client.GetTVDetails(tmdbID)
+	if detailErr == nil {
 		m.Title = details.Name
 		genres := make([]string, len(details.Genres))
 		for i, g := range details.Genres {
@@ -212,8 +210,8 @@ func fetchTVDetails(client *tmdb.Client, tmdbID int, m *db.Media) {
 		m.Genre = strings.Join(genres, ", ")
 	}
 
-	credits, err := client.GetTVCredits(tmdbID)
-	if err == nil {
+	credits, creditErr := client.GetTVCredits(tmdbID)
+	if creditErr == nil {
 		var directors, castNames []string
 		for _, c := range credits.Crew {
 			if c.Job == "Director" || c.Job == "Executive Producer" {

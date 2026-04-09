@@ -13,18 +13,13 @@ import (
 	"github.com/mahin/mahin-cli-v2/db"
 )
 
-// mediaJSON is the JSON representation written to disk.
+// scanMediaJSON is the JSON representation written to disk.
 type scanMediaJSON struct {
 	Title            string  `json:"title"`
 	CleanTitle       string  `json:"clean_title"`
-	Year             int     `json:"year,omitempty"`
 	Type             string  `json:"type"`
-	TmdbID           int     `json:"tmdb_id,omitempty"`
 	ImdbID           string  `json:"imdb_id,omitempty"`
 	Description      string  `json:"description,omitempty"`
-	ImdbRating       float64 `json:"imdb_rating,omitempty"`
-	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
-	Popularity       float64 `json:"popularity,omitempty"`
 	Genre            string  `json:"genre,omitempty"`
 	Director         string  `json:"director,omitempty"`
 	CastList         string  `json:"cast_list,omitempty"`
@@ -33,8 +28,13 @@ type scanMediaJSON struct {
 	OriginalFilePath string  `json:"original_file_path"`
 	CurrentFilePath  string  `json:"current_file_path"`
 	FileExtension    string  `json:"file_extension"`
-	FileSize         int64   `json:"file_size"`
 	GeneratedAt      string  `json:"generated_at"`
+	FileSize         int64   `json:"file_size"`
+	ImdbRating       float64 `json:"imdb_rating,omitempty"`
+	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
+	Popularity       float64 `json:"popularity,omitempty"`
+	Year             int     `json:"year,omitempty"`
+	TmdbID           int     `json:"tmdb_id,omitempty"`
 }
 
 // writeMediaJSON writes a JSON metadata file for the given media record.

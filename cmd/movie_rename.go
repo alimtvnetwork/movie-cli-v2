@@ -26,12 +26,12 @@ func runMovieRename(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
-	media, err := database.ListMedia(0, 10000)
-	if err != nil || len(media) == 0 {
+	media, listErr := database.ListMedia(0, 10000)
+	if listErr != nil || len(media) == 0 {
 		fmt.Println("📭 No media found.")
 		return
 	}
@@ -46,18 +46,18 @@ func runMovieRename(cmd *cobra.Command, args []string) {
 	}
 
 	var items []renameItem
-	for _, m := range media {
-		if m.CurrentFilePath == "" {
+	for i := range media {
+		if media[i].CurrentFilePath == "" {
 			continue
 		}
-		dir := filepath.Dir(m.CurrentFilePath)
-		oldName := filepath.Base(m.CurrentFilePath)
-		newName := cleaner.ToCleanFileName(m.CleanTitle, m.Year, m.FileExtension)
+		dir := filepath.Dir(media[i].CurrentFilePath)
+		oldName := filepath.Base(media[i].CurrentFilePath)
+		newName := cleaner.ToCleanFileName(media[i].CleanTitle, media[i].Year, media[i].FileExtension)
 
 		if oldName != newName {
 			items = append(items, renameItem{
-				media:   m,
-				oldPath: m.CurrentFilePath,
+				media:   media[i],
+				oldPath: media[i].CurrentFilePath,
 				newPath: filepath.Join(dir, newName),
 				oldName: oldName,
 				newName: newName,
@@ -71,9 +71,9 @@ func runMovieRename(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Printf("📝 Found %d files to rename:\n\n", len(items))
-	for i, item := range items {
-		fmt.Printf("  %d. %s\n", i+1, item.oldName)
-		fmt.Printf("     → %s\n\n", item.newName)
+	for i := range items {
+		fmt.Printf("  %d. %s\n", i+1, items[i].oldName)
+		fmt.Printf("     → %s\n\n", items[i].newName)
 	}
 
 	fmt.Print("Rename all? [y/N]: ")
@@ -83,24 +83,24 @@ func runMovieRename(cmd *cobra.Command, args []string) {
 	}
 	confirm := strings.ToLower(strings.TrimSpace(scanner.Text()))
 	if confirm != "y" && confirm != "yes" {
-		fmt.Println("❌ Cancelled.")
+		fmt.Println("❌ Canceled.")
 		return
 	}
 
 	success := 0
-	for _, item := range items {
-		if err := MoveFile(item.oldPath, item.newPath); err != nil {
-			fmt.Fprintf(os.Stderr, "  ❌ Failed: %s → %v\n", item.oldName, err)
+	for i := range items {
+		if moveErr := MoveFile(items[i].oldPath, items[i].newPath); moveErr != nil {
+			fmt.Fprintf(os.Stderr, "  ❌ Failed: %s → %v\n", items[i].oldName, moveErr)
 			continue
 		}
-		if err := database.UpdateMediaPath(item.media.ID, item.newPath); err != nil {
-			fmt.Fprintf(os.Stderr, "  ⚠️  DB update path error: %v\n", err)
+		if updateErr := database.UpdateMediaPath(items[i].media.ID, items[i].newPath); updateErr != nil {
+			fmt.Fprintf(os.Stderr, "  ⚠️  DB update path error: %v\n", updateErr)
 		}
-		if err := database.InsertMoveHistory(item.media.ID, item.oldPath, item.newPath,
-			item.oldName, item.newName); err != nil {
-			fmt.Fprintf(os.Stderr, "  ⚠️  DB history error: %v\n", err)
+		if histErr := database.InsertMoveHistory(items[i].media.ID, items[i].oldPath, items[i].newPath,
+			items[i].oldName, items[i].newName); histErr != nil {
+			fmt.Fprintf(os.Stderr, "  ⚠️  DB history error: %v\n", histErr)
 		}
-		fmt.Printf("  ✅ %s → %s\n", item.oldName, item.newName)
+		fmt.Printf("  ✅ %s → %s\n", items[i].oldName, items[i].newName)
 		success++
 	}
 

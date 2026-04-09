@@ -1,17 +1,16 @@
 // movie_resolve.go — shared media resolver
 //
-// ── Shared helper exported from this file ───────────────────────────
+// -- Shared helper exported from this file --
 //
-//   resolveMediaByQuery(db, query) (*Media, error)
-//       Resolves a media item from the local DB by numeric ID or fuzzy
-//       title match (exact → prefix → first result).
+//	resolveMediaByQuery(db, query) (*Media, error)
+//	    Resolves a media item from the local DB by numeric ID or fuzzy
+//	    title match (exact → prefix → first result).
 //
 // Consumers: movie_info.go, movie_play.go, movie_ls.go (detail view)
 //
 // All commands that accept an <id-or-title> argument should use this
 // helper to keep resolution logic consistent.  Do NOT duplicate the
 // ID-parse → exact-match → prefix-match → fallback chain elsewhere.
-// ────────────────────────────────────────────────────────────────────
 package cmd
 
 import (
@@ -29,34 +28,34 @@ func resolveMediaByQuery(database *db.DB, query string) (*db.Media, error) {
 		return nil, fmt.Errorf("empty media identifier")
 	}
 
-	if id, err := strconv.ParseInt(query, 10, 64); err == nil {
-		m, err := database.GetMediaByID(id)
-		if err != nil {
+	if id, parseErr := strconv.ParseInt(query, 10, 64); parseErr == nil {
+		m, getErr := database.GetMediaByID(id)
+		if getErr != nil {
 			return nil, fmt.Errorf("media not found for ID %d", id)
 		}
 		return m, nil
 	}
 
-	results, err := database.SearchMedia(query)
-	if err != nil {
-		return nil, err
+	results, searchErr := database.SearchMedia(query)
+	if searchErr != nil {
+		return nil, searchErr
 	}
 	if len(results) == 0 {
 		return nil, fmt.Errorf("media not found for %q", query)
 	}
 
-	for _, m := range results {
-		if strings.EqualFold(m.CleanTitle, query) || strings.EqualFold(m.Title, query) {
-			picked := m
+	for i := range results {
+		if strings.EqualFold(results[i].CleanTitle, query) || strings.EqualFold(results[i].Title, query) {
+			picked := results[i]
 			return &picked, nil
 		}
 	}
 
 	queryLower := strings.ToLower(query)
-	for _, m := range results {
-		if strings.HasPrefix(strings.ToLower(m.CleanTitle), queryLower) ||
-			strings.HasPrefix(strings.ToLower(m.Title), queryLower) {
-			picked := m
+	for i := range results {
+		if strings.HasPrefix(strings.ToLower(results[i].CleanTitle), queryLower) ||
+			strings.HasPrefix(strings.ToLower(results[i].Title), queryLower) {
+			picked := results[i]
 			return &picked, nil
 		}
 	}
