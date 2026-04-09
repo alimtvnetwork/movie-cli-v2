@@ -10,23 +10,18 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-const dbDir = "movie-cli-output"
-const dbFile = "mahin.db"
+const dbFile = "movie.db"
 
 // DB wraps the sql.DB connection.
 type DB struct {
 	*sql.DB
-	BasePath string // path to movie-cli-output
+	BasePath string // path to data directory
 }
 
 // Open opens (or creates) the SQLite database and runs migrations.
+// The database is stored in ./data/movie.db relative to the working directory.
 func Open() (*DB, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("cannot find home directory: %w", err)
-	}
-
-	base := filepath.Join(home, dbDir)
+	base := filepath.Join(".", "data")
 	dirs := []string{
 		base,
 		filepath.Join(base, "json", "movie"),
