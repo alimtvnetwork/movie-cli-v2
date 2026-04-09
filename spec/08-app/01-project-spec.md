@@ -120,7 +120,7 @@ All data resides in `./data/`:
 
 ```
 ./data/
-├── movie-cli.db                   # SQLite database (WAL mode)
+├── movie.db                   # SQLite database (WAL mode)
 ├── thumbnails/
 │   └── <slug>/
 │       └── <slug>.jpg         # Downloaded poster images
