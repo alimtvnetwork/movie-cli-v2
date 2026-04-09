@@ -2,7 +2,7 @@
 package main
 
 import (
-	"github.com/mahin/mahin-cli-v1/cmd"
+	"github.com/mahin/mahin-cli-v2/cmd"
 )
 
 func main() {

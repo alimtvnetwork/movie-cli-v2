@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mahin/mahin-cli-v1/cleaner"
-	"github.com/mahin/mahin-cli-v1/db"
+	"github.com/mahin/mahin-cli-v2/cleaner"
+	"github.com/mahin/mahin-cli-v2/db"
 )
 
 var movieRenameCmd = &cobra.Command{

@@ -34,8 +34,8 @@ pwsh
 ### Step 1 — Clone the Repository
 
 ```powershell
-git clone https://github.com/mahin/mahin-cli-v1.git
-cd mahin-cli-v1
+git clone https://github.com/mahin/mahin-cli-v2.git
+cd mahin-cli-v2
 ```
 
 ### Step 2 — Set Execution Policy (Windows only)
@@ -80,13 +80,13 @@ $env:PATH += ";E:\bin-run"
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/mahin/mahin-cli-v1.git; cd mahin-cli-v1; .\run.ps1
+git clone https://github.com/mahin/mahin-cli-v2.git; cd mahin-cli-v2; .\run.ps1
 ```
 
 ### macOS / Linux
 
 ```bash
-git clone https://github.com/mahin/mahin-cli-v1.git && cd mahin-cli-v1 && pwsh run.ps1
+git clone https://github.com/mahin/mahin-cli-v2.git && cd mahin-cli-v2 && pwsh run.ps1
 ```
 
 ## Configuration

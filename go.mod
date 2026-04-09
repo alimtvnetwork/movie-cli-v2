@@ -1,4 +1,4 @@
-module github.com/mahin/mahin-cli-v1
+module github.com/mahin/mahin-cli-v2
 
 go 1.22
 
