@@ -36,9 +36,9 @@ var multiSpace = regexp.MustCompile(`\s{2,}`)
 // Result holds the cleaned information extracted from a filename.
 type Result struct {
 	CleanTitle string
-	Year       int
 	Extension  string
 	Type       string // "movie" or "tv"
+	Year       int
 }
 
 // IsVideoFile checks if the file has a video extension.

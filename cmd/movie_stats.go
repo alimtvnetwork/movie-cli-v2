@@ -22,7 +22,7 @@ func runMovieStats(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
@@ -37,7 +37,7 @@ func runMovieStats(cmd *cobra.Command, args []string) {
 	total, err := database.CountMedia("")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 
 	if total == 0 {
@@ -102,13 +102,13 @@ func runMovieStats(cmd *cobra.Command, args []string) {
 	if listErr != nil {
 		fmt.Fprintf(os.Stderr, "⚠️  List media error: %v\n", listErr)
 	}
-	for _, m := range allMedia {
-		if m.ImdbRating > 0 {
-			avgImdb += m.ImdbRating
+	for i := range allMedia {
+		if allMedia[i].ImdbRating > 0 {
+			avgImdb += allMedia[i].ImdbRating
 			imdbCount++
 		}
-		if m.TmdbRating > 0 {
-			avgTmdb += m.TmdbRating
+		if allMedia[i].TmdbRating > 0 {
+			avgTmdb += allMedia[i].TmdbRating
 			tmdbCount++
 		}
 	}

@@ -74,7 +74,10 @@ func humanSize(bytes int64) string {
 }
 
 // promptSourceDirectory asks the user to pick a directory.
-func promptSourceDirectory(scanner interface{ Scan() bool; Text() string }, database *db.DB, home string) string {
+func promptSourceDirectory(scanner interface {
+	Scan() bool
+	Text() string
+}, database *db.DB, home string) string {
 	scanDir, _ := database.GetConfig("scan_dir")
 	scanDir = expandHome(scanDir, home)
 
@@ -129,7 +132,10 @@ func promptSourceDirectory(scanner interface{ Scan() bool; Text() string }, data
 }
 
 // promptDestination asks the user to choose a move destination.
-func promptDestination(scanner interface{ Scan() bool; Text() string }, database *db.DB, home string) string {
+func promptDestination(scanner interface {
+	Scan() bool
+	Text() string
+}, database *db.DB, home string) string {
 	moviesDir, _ := database.GetConfig("movies_dir")
 	tvDir, _ := database.GetConfig("tv_dir")
 	archiveDir, _ := database.GetConfig("archive_dir")
@@ -261,5 +267,5 @@ func saveHistoryLog(basePath, title string, year int, fromPath, toPath string) {
 
 	filename := fmt.Sprintf("move-%s.json", time.Now().UTC().Format("20060102-150405"))
 	historyPath := filepath.Join(historyDir, filename)
-	os.WriteFile(historyPath, data, 0644)
+	_ = os.WriteFile(historyPath, data, 0644)
 }

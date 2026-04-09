@@ -36,7 +36,7 @@ func runMovieSuggest(cmd *cobra.Command, args []string) {
 	database, err := db.Open()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "❌ Database error: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer database.Close()
 
@@ -50,7 +50,7 @@ func runMovieSuggest(cmd *cobra.Command, args []string) {
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "❌ TMDb API key required for suggestions.")
 		fmt.Fprintln(os.Stderr, "   Set with: movie movie config set tmdb_api_key YOUR_KEY")
-		os.Exit(1)
+		return
 	}
 
 	client := tmdb.NewClient(apiKey)
