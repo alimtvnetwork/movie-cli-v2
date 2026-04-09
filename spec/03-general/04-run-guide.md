@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`run.ps1` is the single command to pull, build, deploy, and optionally run the **mahin** CLI. It replaces manual `go build` workflows with a repeatable pipeline that handles git safety, dependency resolution, cross-platform compilation, safe deployment with rollback, and argument forwarding.
+`run.ps1` is the single command to pull, build, deploy, and optionally run the **movie** CLI. It replaces manual `go build` workflows with a repeatable pipeline that handles git safety, dependency resolution, cross-platform compilation, safe deployment with rollback, and argument forwarding.
 
 ## Syntax
 
@@ -31,7 +31,7 @@
 
 Without any flags, the script runs the full pipeline:
 
-1. **Banner** — displays the mahin builder header
+1. **Banner** — displays the movie builder header
 2. **Config** — loads `powershell.json` (falls back to defaults)
 3. **Git Pull** — ensures `main` branch, pulls latest changes
 4. **Dependencies** — verifies Go is installed, runs `go mod tidy`
@@ -73,7 +73,7 @@ When no config file exists, these defaults apply:
 |-------|---------|
 | `deployPath` | `E:\bin-run` |
 | `buildOutput` | `./bin` |
-| `binaryName` | `mahin.exe` |
+| `binaryName` | `movie.exe` |
 | `copyData` | `false` |
 
 ## Git Safety

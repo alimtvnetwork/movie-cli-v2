@@ -4,7 +4,7 @@
 
 ## Overview
 
-`run.ps1` is the single-entry automation script for building, deploying, and running the **mahin** CLI. It replaces ad-hoc manual steps with a repeatable, configurable pipeline.
+`run.ps1` is the single-entry automation script for building, deploying, and running the **movie** CLI. It replaces ad-hoc manual steps with a repeatable, configurable pipeline.
 
 ## Pipeline Phases
 

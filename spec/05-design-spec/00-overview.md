@@ -8,7 +8,7 @@
 
 ## Overview
 
-Visual and styling specifications for the mahin project's documentation and diagrams.
+Visual and styling specifications for the movie project's documentation and diagrams.
 
 ---
 

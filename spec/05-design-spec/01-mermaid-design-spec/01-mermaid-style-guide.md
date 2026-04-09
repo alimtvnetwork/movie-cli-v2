@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-Define consistent visual styling for all Mermaid flowchart diagrams across the mahin project spec. Colors derive from the project's design tokens (see [Design Tokens](../../02-error-manage-spec/02-error-architecture/04-error-modal/04-color-themes/01-design-tokens.md)).
+Define consistent visual styling for all Mermaid flowchart diagrams across the movie project spec. Colors derive from the project's design tokens (see [Design Tokens](../../02-error-manage-spec/02-error-architecture/04-error-modal/04-color-themes/01-design-tokens.md)).
 
 ---
 

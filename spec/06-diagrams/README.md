@@ -1,6 +1,6 @@
 # Diagrams Index
 
-All architectural and flow diagrams for the `mahin` CLI.
+All architectural and flow diagrams for the `movie` CLI.
 
 | # | File | Description |
 |---|------|-------------|

@@ -1,6 +1,6 @@
 # 01 — Install Guide
 
-> How to set up the **mahin** CLI development environment from scratch.
+> How to set up the **movie** CLI development environment from scratch.
 
 ## Prerequisites
 
@@ -34,8 +34,8 @@ pwsh
 ### Step 1 — Clone the Repository
 
 ```powershell
-git clone https://github.com/mahin/mahin-cli-v2.git
-cd mahin-cli-v2
+git clone https://github.com/movie/movie-cli-v2.git
+cd movie-cli-v2
 ```
 
 ### Step 2 — Set Execution Policy (Windows only)
@@ -55,18 +55,18 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 This will:
 1. Pull latest code from `main`
 2. Run `go mod tidy`
-3. Build the `mahin` binary into `./bin/`
+3. Build the `movie` binary into `./bin/`
 4. Deploy to the configured deploy path (default: `E:\bin-run` on Windows, `/usr/local/bin` on Unix)
 
 ### Step 4 — Verify Installation
 
 ```powershell
-mahin version
+movie version
 ```
 
 Expected output: version string with commit hash and build date.
 
-If `mahin` is not found, ensure the deploy path is in your `PATH`:
+If `movie` is not found, ensure the deploy path is in your `PATH`:
 
 ```powershell
 # Windows — add to PATH for current session
@@ -80,13 +80,13 @@ $env:PATH += ";E:\bin-run"
 ### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/mahin/mahin-cli-v2.git; cd mahin-cli-v2; .\run.ps1
+git clone https://github.com/movie/movie-cli-v2.git; cd movie-cli-v2; .\run.ps1
 ```
 
 ### macOS / Linux
 
 ```bash
-git clone https://github.com/mahin/mahin-cli-v2.git && cd mahin-cli-v2 && pwsh run.ps1
+git clone https://github.com/movie/movie-cli-v2.git && cd movie-cli-v2 && pwsh run.ps1
 ```
 
 ## Configuration
@@ -99,7 +99,7 @@ Default `powershell.json`:
 {
   "deployPath": "E:\\bin-run",
   "buildOutput": "./bin",
-  "binaryName": "mahin.exe",
+  "binaryName": "movie.exe",
   "copyData": false
 }
 ```
@@ -111,7 +111,7 @@ Default `powershell.json`:
 | `go: command not found` | Install Go and ensure it's in PATH |
 | `pwsh: command not found` | Install PowerShell 7+: `brew install --cask powershell` |
 | Script blocked by execution policy | Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
-| `mahin: command not found` after build | Add deploy path to PATH (see Step 4) |
+| `movie: command not found` after build | Add deploy path to PATH (see Step 4) |
 | Git pull fails with local changes | Use `-ForcePull` or follow the interactive menu |
 | Build fails with missing modules | Delete `go.sum` and re-run `go mod tidy` |
 | Permission denied on `/usr/local/bin` | Run with `sudo pwsh run.ps1` or set `-DeployPath ~/bin` |
@@ -122,9 +122,9 @@ After a successful run, you should have:
 
 ```
 <deployPath>/
-  └── mahin.exe          # (or 'mahin' on Unix)
+  └── movie.exe          # (or 'movie' on Unix)
 
 <repoRoot>/
   └── bin/
-      └── mahin.exe      # build artifact (intermediate)
+      └── movie.exe      # build artifact (intermediate)
 ```

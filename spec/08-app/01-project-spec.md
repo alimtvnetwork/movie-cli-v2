@@ -4,7 +4,7 @@
 > **Date**: 17-Mar-2026  
 > **Binary Name**: `movie-cli`  
 > **Language**: Go 1.22  
-> **Module**: `github.com/mahin/movie-cli`
+> **Module**: `github.com/movie/movie-cli`
 
 ---
 
@@ -539,9 +539,9 @@ Hardcoded map of 27 genre IDs covering both movie and TV genres (Action through 
 ### Build Flags
 ```
 -ldflags "-s -w
-  -X github.com/mahin/movie-cli/version.Version=<git tag>
-  -X github.com/mahin/movie-cli/version.Commit=<short SHA>
-  -X github.com/mahin/movie-cli/version.BuildDate=<YYYY-MM-DD>"
+  -X github.com/movie/movie-cli/version.Version=<git tag>
+  -X github.com/movie/movie-cli/version.Commit=<short SHA>
+  -X github.com/movie/movie-cli/version.BuildDate=<YYYY-MM-DD>"
 ```
 
 ### PowerShell Deploy (`build.ps1`)
