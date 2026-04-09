@@ -37,10 +37,10 @@ func NewClient(apiKey string) *Client {
 // SearchResult holds a search result from TMDb.
 type SearchResult struct {
 	Overview    string  `json:"overview"`
-	Title       string  `json:"title"`         // for movies
-	Name        string  `json:"name"`          // for TV
-	ReleaseDate string  `json:"release_date"`  // movies
-	FirstAir    string  `json:"first_air_date"` // TV
+	Title       string  `json:"title"`
+	Name        string  `json:"name"`
+	ReleaseDate string  `json:"release_date"`
+	FirstAir    string  `json:"first_air_date"`
 	PosterPath  string  `json:"poster_path"`
 	MediaType   string  `json:"media_type"`
 	VoteAvg     float64 `json:"vote_average"`

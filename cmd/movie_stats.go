@@ -103,14 +103,12 @@ func runMovieStats(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(os.Stderr, "⚠️  List media error: %v\n", listErr)
 	}
 	for i := range allMedia {
-		m := &allMedia[i]
-		_ = m
-		if m.ImdbRating > 0 {
-			avgImdb += m.ImdbRating
+		if allMedia[i].ImdbRating > 0 {
+			avgImdb += allMedia[i].ImdbRating
 			imdbCount++
 		}
-		if m.TmdbRating > 0 {
-			avgTmdb += m.TmdbRating
+		if allMedia[i].TmdbRating > 0 {
+			avgTmdb += allMedia[i].TmdbRating
 			tmdbCount++
 		}
 	}
