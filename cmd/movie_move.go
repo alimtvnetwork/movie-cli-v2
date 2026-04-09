@@ -104,7 +104,7 @@ func runBatchMove(database *db.DB, scanner *bufio.Scanner, sourceDir string, fil
 		destPath  string
 		destDir   string
 		cleanName string
-		result    cleaner.CleanResult
+		result    cleaner.Result
 		fileInfo  os.FileInfo
 	}
 
@@ -276,7 +276,7 @@ func runInteractiveMove(database *db.DB, scanner *bufio.Scanner, sourceDir strin
 }
 
 // trackMove records a move in the database and JSON history log.
-func trackMove(database *db.DB, result cleaner.CleanResult, fileInfo os.FileInfo, srcPath, destPath, cleanName string) {
+func trackMove(database *db.DB, result cleaner.Result, fileInfo os.FileInfo, srcPath, destPath, cleanName string) {
 	var mediaID int64
 	existing, searchErr := database.SearchMedia(result.CleanTitle)
 	if searchErr != nil {
