@@ -57,6 +57,129 @@ Every command supports `--help` or `-h` for detailed usage.
 
 <div align="center">
 
+## 🎥 Demo
+
+</div>
+
+### 📂 Scanning a Folder
+
+<!-- Replace with actual GIF: docs/screenshots/demo-scan.gif -->
+<!-- Record with: vhs docs/screenshots/scan.tape  or  asciinema rec -->
+
+```
+$ movie movie scan ~/Downloads
+
+🔍 Scanning: /home/user/Downloads
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Found 12 video files
+
+  [1/12] Scream.2022.1080p.WEBRip.x264-RARBG.mkv
+         → Title: Scream (2022)
+         → TMDb: ★ 6.8 | Horror, Mystery, Thriller
+         → Poster saved: thumbnails/scream-2022/scream-2022.jpg
+         ✅ Saved to database
+
+  [2/12] The.Batman.2022.2160p.BluRay.x265.mkv
+         → Title: The Batman (2022)
+         → TMDb: ★ 7.7 | Crime, Mystery, Thriller
+         → Poster saved: thumbnails/the-batman-2022/the-batman-2022.jpg
+         ✅ Saved to database
+
+  ...
+
+  ✅ Done — 12 items scanned, 11 new, 1 updated
+```
+
+<p align="center">
+  <img src="docs/screenshots/demo-scan.gif" alt="movie scan demo" width="700">
+  <br><em>↑ Replace with actual recording</em>
+</p>
+
+---
+
+### 📋 Browsing Your Library
+
+<!-- Replace with actual GIF: docs/screenshots/demo-ls.gif -->
+
+```
+$ movie movie ls
+
+🎬 Library — Page 1 of 3 (20 per page)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  #   Title                          Year   Type    Rating
+  ─── ────────────────────────────── ────── ─────── ──────
+  1   Scream                         2022   🎬      ★ 6.8
+  2   The Batman                     2022   🎬      ★ 7.7
+  3   Everything Everywhere All...   2022   🎬      ★ 7.8
+  4   Breaking Bad                   2008   📺      ★ 8.9
+  5   Severance                      2022   📺      ★ 8.4
+  ...
+
+  [N]ext  [P]rev  [1-9] Detail  [Q]uit
+```
+
+<p align="center">
+  <img src="docs/screenshots/demo-ls.gif" alt="movie ls demo" width="700">
+  <br><em>↑ Replace with actual recording</em>
+</p>
+
+---
+
+### 🎯 Getting Suggestions
+
+<!-- Replace with actual GIF: docs/screenshots/demo-suggest.gif -->
+
+```
+$ movie movie suggest 5
+
+🎯 Movie Suggest
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Select category:
+  1. 🎬 Movie
+  2. 📺 TV
+  3. 🎲 Random
+
+  Choose: 1
+
+  📽️  Recommendations based on your library:
+
+  #   Title                          Year   Rating   Genre
+  ─── ────────────────────────────── ────── ──────── ────────────────
+  1   Nope                           2022   ★ 6.8    Horror, Sci-Fi
+  2   X                              2022   ★ 6.6    Horror, Mystery
+  3   Pearl                          2022   ★ 7.0    Drama, Horror
+  4   Bodies Bodies Bodies            2022   ★ 6.5    Comedy, Horror
+  5   Barbarian                      2022   ★ 7.0    Horror, Thriller
+
+  🔥 Trending This Week:
+  1   Oppenheimer                    2023   ★ 8.1    Drama, History
+  2   Killers of the Flower Moon     2023   ★ 7.5    Crime, Drama
+  3   Poor Things                    2023   ★ 7.9    Comedy, Drama
+```
+
+<p align="center">
+  <img src="docs/screenshots/demo-suggest.gif" alt="movie suggest demo" width="700">
+  <br><em>↑ Replace with actual recording</em>
+</p>
+
+> **📹 Recording your own demos:**
+> Use [VHS](https://github.com/charmbracelet/vhs) or [asciinema](https://asciinema.org/) to record terminal sessions as GIFs.
+> ```bash
+> # VHS (recommended — deterministic, scriptable)
+> vhs docs/screenshots/scan.tape
+>
+> # asciinema + agg (manual recording)
+> asciinema rec demo.cast
+> agg demo.cast docs/screenshots/demo-scan.gif
+> ```
+
+---
+
+<div align="center">
+
 ## Installation
 
 </div>
